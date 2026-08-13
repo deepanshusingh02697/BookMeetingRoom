@@ -1,0 +1,168 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum RoomStatus {
+  AVAILABLE
+  DISABLED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role Role @default(EMPLOYEE)
+
+  bookings      Booking[]       @relation("Organizer")
+  pariticipants Participants[]
+  waitlist      WaitlistEntry[]
+  checkIns      CheckIn[]
+}
+
+model Room {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  capacity Int
+  floor    Int
+  location String
+  status   RoomStatus @default(AVAILABLE)
+
+  // equipments  Equipment[]
+  roomEquipments RoomEquipment[]
+  bookings    Booking[]
+  Waitlists   WaitlistEntry[]
+  maintenance Maintenance[]
+}
+
+model Equipment {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  // rooms Room[]
+  roomEquipments RoomEquipment[]
+  
+}
+
+model RoomEquipment{
+  id Int @id @default(autoincrement())
+
+  roomId Int
+  room Room @relation(fields: [roomId],references: [id])
+
+  equipmentId Int
+  equipment Equipment @relation(fields: [equipmentId],references: [id])
+
+  createdAt DateTime @default(now())
+  @@unique([roomId, equipmentId])
+
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id])
+
+  organizerId Int
+  organizer   User @relation("Organizer", fields: [organizerId], references: [id])
+
+  title       String
+  description String?
+
+  startTime DateTime
+  endTime   DateTime
+
+  status BookingStatus @default(CONFIRMED)
+
+  isRecurring    Boolean @default(false)
+  recurrenceRule Json?
+  recurrenceId   String?
+
+  participants Participants[]
+
+  checkIn CheckIn?
+
+  createdAt DateTime @default(now())
+
+  @@index([roomId, startTime, endTime])
+  @@index([recurrenceId])
+}
+
+model Participants {
+  id Int @id @default(autoincrement())
+
+  bookingId Int
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  @@unique([bookingId, userId])
+}
+
+model CheckIn {
+  id Int @id @default(autoincrement())
+
+  bookingId Int     @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  checkInBy Int
+  user      User @relation(fields: [checkInBy], references: [id])
+
+  checkedInAt DateTime @default(now())
+}
+
+model WaitlistEntry {
+  id Int @id @default(autoincrement())
+
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id])
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([roomId, userId, startTime, endTime])
+  @@index([roomId, startTime, endTime])
+}
+
+model Maintenance {
+  id Int @id @default(autoincrement())
+
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  reason    String?
+
+  @@index([roomId, startTime, endTime])
+}
