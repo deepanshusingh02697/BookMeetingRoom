@@ -41,8 +41,6 @@ type Room {
   location: String!
   status: RoomStatus!
   equipments: [Equipment!]!
-  bookings: [Booking!]!
-  maintenance: [Maintenance!]!
 }
 
 type Equipment {
@@ -161,6 +159,7 @@ type MaintinancePayload{
 
 
 type Query {
+  CurrUser:User!
   SearchRooms(
     startTime: String!
     endTime: String!
@@ -180,6 +179,10 @@ type Query {
 
   AdminCalender(startDate: String!,endDate:String!):[Booking!]!
   UsedAnalytics(startDate:String!,endDate:String!):UsageData!
+
+  GetRooms:[Room!]!
+  GetRoomDetails(roomId:Int!):Room!
+  GetEquipments:[Equipment!]!
 }
 type Mutation {
   SignUp(

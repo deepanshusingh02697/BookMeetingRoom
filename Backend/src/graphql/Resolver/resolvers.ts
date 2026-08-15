@@ -30,6 +30,12 @@ import { Prisma } from "../../../generated/prisma/client";
 
 export const resolvers = {
   Query: {
+    CurrUser: async (_parent: unknown, _args: unknown, ctx: Context) => {
+      isAuth(ctx);
+      return prisma.user.findUnique({
+        where: { id: ctx.userId! },
+      });
+    },
     MyBookings: async (_parent: unknown, _args: unknown, ctx: Context) => {
       isAuth(ctx);
       return prisma.booking.findMany({
@@ -112,8 +118,8 @@ export const resolvers = {
 
       return prisma.booking.findMany({
         where: {
-          startTime: { gte: start },
-          endTime: { lte: end },
+          startTime: { lt: end },
+          endTime: { gt: start },
         },
         include: {
           room: true,
@@ -220,8 +226,8 @@ export const resolvers = {
           bookings: {
             none: {
               status: "CONFIRMED",
-              startTime: {lt: end},
-              endTime: {gt: start},
+              startTime: { lt: end },
+              endTime: { gt: start },
             },
           },
           maintenance: {
@@ -236,8 +242,37 @@ export const resolvers = {
           },
         },
       });
-      return rooms
+      return rooms;
     },
+
+    GetRooms:async(_parent:unknown,_args:unknown,ctx:Context)=>{
+      isAuth(ctx);
+      return prisma.room.findMany({
+        include:{
+          roomEquipments:{
+            include:{equipment:true}
+          }
+        },
+        orderBy:{
+          id:"asc"
+        }
+      })
+    },
+    GetRoomDetails:async(_parent:unknown,args:{roomId:number},ctx:Context)=>{
+      isAuth(ctx)
+      return prisma.room.findUnique({
+        where:{id:args.roomId},
+        include:{roomEquipments:{include:{equipment:true}}}
+      })
+    },
+    GetEquipments:async(_parent:unknown,_args:unknown,ctx:Context)=>{
+      isAuth(ctx);
+      return prisma.equipment.findMany({
+        orderBy:{
+          id:"asc"
+        }
+      })
+    }
   },
   Mutation: {
     SignUp: async (
@@ -327,9 +362,6 @@ export const resolvers = {
       };
     },
     LogOut: async (_parent: unknown, _args: unknown, ctx: Context) => {
-      if (!ctx.userId) {
-        throw new Error("Not authenticated to logout");
-      }
       ctx.res.clearCookie("accessToken", accessCookieOptions);
       return { success: true, msg: "loged out successfully" };
     },
@@ -722,15 +754,11 @@ export const resolvers = {
       }
       const totalPeople = 1 + (args.participantUserIds?.length ?? 0);
       if (totalPeople > room.capacity) {
-        throw new Error(
-          "people can not be greater than room capcity",
-        );
+        throw new Error("people can not be greater than room capcity");
       }
       if (args.recurringFreq) {
         if (!args.recurrenceEndDate) {
-          throw new Error(
-            "recurrence end date required",
-          );
+          throw new Error("recurrence end date required");
         }
         const recuEndDate = new Date(args.recurrenceEndDate);
         const occur = buildRecurDates(
@@ -933,13 +961,11 @@ export const resolvers = {
         where: { recurrenceId: args.recurId, status: "CONFIRMED" },
         data: { status: "CANCELLED" },
       });
-      const bookingToCancel = bookings.filter((bk) => bk.status === "CONFIRMED");
+      const bookingToCancel = bookings.filter(
+        (bk) => bk.status === "CONFIRMED",
+      );
       for (const bk of bookingToCancel) {
-        await convertWeightlist(
-          bk.roomId,
-          bk.startTime,
-          bk.endTime,
-        );
+        await convertWeightlist(bk.roomId, bk.startTime, bk.endTime);
       }
       return "recurring booking cancel successfully";
     },
@@ -968,9 +994,7 @@ export const resolvers = {
         },
       });
       if (!overlapping) {
-        throw new Error(
-          "no need to join waitlist, room is free",
-        );
+        throw new Error("no need to join waitlist, room is free");
       }
       const checkExist = await prisma.waitlistEntry.findUnique({
         where: {
@@ -1044,7 +1068,7 @@ export const resolvers = {
       }
 
       checkInAllow(booking.startTime);
-      
+
       const findCheckIn = await prisma.checkIn.findUnique({
         where: { bookingId: args.bookingId },
       });

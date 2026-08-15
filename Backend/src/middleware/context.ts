@@ -15,6 +15,7 @@ export const createCheckAuth = async ({
   req: Request;
   res: Response;
 }): Promise<Context> => {
+  console.log("COOKIES:", req.cookies);
   let userId: number | null = null;
   let role: Context["role"] = null;
 
