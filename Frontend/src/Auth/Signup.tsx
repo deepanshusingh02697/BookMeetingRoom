@@ -15,7 +15,6 @@ type SignupInput = {
   password: string;
   confirmPassword: string;
 };
-
 type SignupError = {
   firstName: string;
   lastName: string;
@@ -23,14 +22,11 @@ type SignupError = {
   password: string;
   confirmPassword: string;
 };
-
 export default function Signup() {
   const navigate = useNavigate();
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [signupInput, setSignupInput] = useState<SignupInput>({
     firstName: "",
     lastName: "",
@@ -38,7 +34,6 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
   });
-
   const [error, setError] = useState<SignupError>({
     firstName: "",
     lastName: "",
@@ -112,8 +107,7 @@ export default function Signup() {
         "Last name can only contain letters, spaces and hyphens (-)";
       isValid = false;
     }
-    const emailRegex =
-      /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!email) {
       errors.email = "Email is required";
       isValid = false;
@@ -199,7 +193,6 @@ export default function Signup() {
         });
       }
     } catch (error: unknown) {
-      console.log(error);
       if (CombinedGraphQLErrors.is(error)) {
         const graphError = error.errors?.[0];
         if (!graphError) {
@@ -211,9 +204,7 @@ export default function Signup() {
           return;
         }
         const message = graphError.message;
-        const backendField = graphError.extensions?.field as
-          | string
-          | undefined;
+        const backendField = graphError.extensions?.field as string | undefined;
         if (!backendField) {
           toast(message, {
             position: "top-right",
@@ -242,22 +233,14 @@ export default function Signup() {
           ...prev,
           [frontendField]: message,
         }));
-        switch (frontendField) {
-          case "firstName":
-            firstNameRef.current?.focus();
-            break;
-
-          case "lastName":
-            lastNameRef.current?.focus();
-            break;
-
-          case "email":
-            emailRef.current?.focus();
-            break;
-
-          case "password":
-            passwordRef.current?.focus();
-            break;
+        if (frontendField === "firstName") {
+          firstNameRef.current?.focus();
+        } else if (frontendField === "lastName") {
+          lastNameRef.current?.focus();
+        } else if (frontendField === "email") {
+          emailRef.current?.focus();
+        } else if (frontendField === "password") {
+          passwordRef.current?.focus();
         }
       } else if (error instanceof Error) {
         toast(error.message, {
@@ -285,7 +268,6 @@ export default function Signup() {
         >
           Sign In
         </button>
-
         <button
           type="button"
           onClick={() => navigate("/signup")}
@@ -387,7 +369,7 @@ export default function Signup() {
               value={signupInput.confirmPassword}
               onChange={handleChange}
               placeholder="Confirm Password"
-             className={"h-11 w-full rounded border px-3"}
+              className={"h-11 w-full rounded border px-3"}
             />
 
             <button
@@ -400,12 +382,9 @@ export default function Signup() {
           </div>
 
           {error.confirmPassword && (
-            <p className="mt-1 text-xs text-red-500">
-              {error.confirmPassword}
-            </p>
+            <p className="mt-1 text-xs text-red-500">{error.confirmPassword}</p>
           )}
         </div>
-
         <button
           type="submit"
           disabled={loading}

@@ -100,7 +100,7 @@ export default function Login() {
         const response = await LogInUser({
           variables,
         });
-        
+
         if (response.data?.LogIn?.success) {
           toast(response.data.LogIn.msg, {
             position: "top-right",
@@ -134,7 +134,7 @@ export default function Login() {
           });
         }
       }
-    } catch (error: unknown) {   
+    } catch (error: unknown) {
       if (CombinedGraphQLErrors.is(error)) {
         const graphError = error.errors?.[0];
         if (!graphError) {
@@ -172,13 +172,10 @@ export default function Login() {
           ...prev,
           [frontendField]: message,
         }));
-        switch (frontendField) {
-          case "email":
-            emailRef.current?.focus();
-            break;
-          case "password":
-            passwordRef.current?.focus();
-            break;
+        if(frontendField==="email"){
+          emailRef.current?.focus();
+        }else if(frontendField==="password"){
+          passwordRef.current?.focus();
         }
       } else if (error instanceof Error) {
         toast(error.message, {
@@ -319,7 +316,7 @@ export default function Login() {
               value={loginInput.password}
               onChange={handleChange}
               placeholder="Enter your password"
-              className={`h-11 w-full rounded border px-3 `}
+              className={"h-11 w-full rounded border px-3"}
             />
 
             <button

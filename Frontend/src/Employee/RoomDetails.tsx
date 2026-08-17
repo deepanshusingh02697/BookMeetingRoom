@@ -10,6 +10,7 @@ import {
 import { useQuery } from "@apollo/client/react";
 import { GetRoomDetails_Query } from "../graphql/Query";
 import type { GetRoomDeatils_Interface } from "../graphql/Client";
+import Loader from "../Component/Loader";
 
 export default function RoomDetails() {
   const { roomId } = useParams();
@@ -43,12 +44,7 @@ export default function RoomDetails() {
   }
   if (loading) {
     return (
-      <div className="rounded-md border bg-white p-10 text-center shadow-sm">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#18216B]" />
-        <p className="mt-3 text-sm font-medium text-gray-700">
-          Loading room details...
-        </p>
-      </div>
+      <Loader/>
     );
   }
 
@@ -117,10 +113,17 @@ export default function RoomDetails() {
             <div className="rounded-md border p-4">
               <div className="flex items-center gap-2 text-gray-500">
                 <FiUsers className="text-[#18216B]" />
-                <span className="text-xs">Capacity</span>
+                <span className="text-xs">Room Capacity</span>
               </div>
+
               <p className="mt-2 text-lg font-semibold text-gray-900">
                 {room.capacity} people
+              </p>
+              <p className="mt-1 text-xs text-red-400">
+                {room.particiCount} participants
+              </p>
+              <p className="mt-1 text-xs font-medium text-green-500">
+                {room.availableSpace} spaces available
               </p>
             </div>
             <div className="rounded-md border p-4">
@@ -194,10 +197,10 @@ export default function RoomDetails() {
           ) : (
             <div className="mt-5 rounded-md bg-gray-100 p-3 text-center">
               <p className="text-sm font-medium text-gray-700">
-                This room can't be booked
+                Room can't be booked
               </p>
               <p className="mt-1 text-xs text-gray-500">
-                The room is currently {room.status.toLowerCase()}.
+                room is currently {room.status.toLowerCase()}.
               </p>
             </div>
           )}

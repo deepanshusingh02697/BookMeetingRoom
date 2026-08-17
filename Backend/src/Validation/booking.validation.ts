@@ -3,8 +3,6 @@ import { GraphQLError } from "graphql/error";
 export const checkTime = (startTime: string, endTime: string) => {
   const start = new Date(startTime);
   const end = new Date(endTime);
-  console.log(start, end);
-
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new GraphQLError("Invalid date format", {
       extensions: { code: "BAD_INPUT" },
@@ -48,25 +46,25 @@ export const buildRecurDates = (
   recurEndDate: Date,
 ) => {
   const durationMs = end.getTime() - start.getTime();
-  const stepDays = freq==="DAILY"?1:7
+  const stepDays = freq==="DAILY"?1:7;
 
   const occur:{start:Date,end:Date}[]=[];
-  let currentStart=new Date(start)
+  let currentStart=new Date(start);
 
   while(currentStart<=recurEndDate){
-    const curEnd= new Date(currentStart.getTime()+durationMs)
+    const curEnd= new Date(currentStart.getTime()+durationMs);
 
-    occur.push({start: new Date(currentStart), end: curEnd})
+    occur.push({start: new Date(currentStart), end: curEnd});
 
     currentStart = new Date(
       currentStart.getTime() + stepDays * 24 * 60 * 60 * 1000,
     );
   }
   if(occur.length===0){
-    throw new Error("Recurrence end date have no occrences")
+    throw new Error("Recurrence end date have no occrences");
   }
   if(occur.length>52){
-    throw new Error("Recurrence range to long")
+    throw new Error("Recurrence range to long");
   }
-  return occur
+  return occur;
 };

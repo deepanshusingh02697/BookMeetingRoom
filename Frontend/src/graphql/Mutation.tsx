@@ -29,14 +29,8 @@ export const signUpUser_Mutation = gql`
 `;
 
 export const loginUser_Mutation = gql`
-  mutation LogIn(
-    $email: String!
-    $password: String!
-  ) {
-    LogIn(
-      email: $email
-      password: $password
-    ) {
+  mutation LogIn($email: String!, $password: String!) {
+    LogIn(email: $email, password: $password) {
       success
       msg
       user {
@@ -53,14 +47,8 @@ export const loginUser_Mutation = gql`
 `;
 
 export const adminLogin_Mutation = gql`
-  mutation AdminLogIn(
-    $email: String!
-    $password: String!
-  ) {
-    AdminLogIn(
-      email: $email
-      password: $password
-    ) {
+  mutation AdminLogIn($email: String!, $password: String!) {
+    AdminLogIn(email: $email, password: $password) {
       success
       msg
       user {
@@ -205,14 +193,8 @@ export const createEquipment_Mutation = gql`
 `;
 
 export const addEquipmentToRoom_Mutation = gql`
-  mutation AddEquipmentToRoom(
-    $roomId: Int!
-    $equipmentId: Int!
-  ) {
-    AddEquipmentToRoom(
-      roomId: $roomId
-      equipmentId: $equipmentId
-    ) {
+  mutation AddEquipmentToRoom($roomId: Int!, $equipmentId: Int!) {
+    AddEquipmentToRoom(roomId: $roomId, equipmentId: $equipmentId) {
       success
       msg
       room {
@@ -232,14 +214,8 @@ export const addEquipmentToRoom_Mutation = gql`
 `;
 
 export const removeEquipmentFromRoom_Mutation = gql`
-  mutation RemoveEquipmentFromRoom(
-    $roomId: Int!
-    $equipmentId: Int!
-  ) {
-    RemoveEquipmentFromRoom(
-      roomId: $roomId
-      equipmentId: $equipmentId
-    ) {
+  mutation RemoveEquipmentFromRoom($roomId: Int!, $equipmentId: Int!) {
+    RemoveEquipmentFromRoom(roomId: $roomId, equipmentId: $equipmentId) {
       success
       msg
       room {
@@ -253,6 +229,18 @@ export const removeEquipmentFromRoom_Mutation = gql`
           id
           name
         }
+      }
+    }
+  }
+`;
+export const udpateEquipment = gql`
+  mutation EditEquipment($equipmentId: Int!, $name: String) {
+    EditEquipment(equipmentId: $equipmentId, name: $name) {
+      msg
+      success
+      equipment {
+        id
+        name
       }
     }
   }
@@ -412,21 +400,9 @@ export const cancelBooking_Mutation = gql`
   }
 `;
 
-export const cancelRecurringBooking_Mutation = gql`
-  mutation CancelRecurringBooking($recurId: String!) {
-    CancelRecurringBooking(recurId: $recurId)
-  }
-`;
-
 export const addParticipant_Mutation = gql`
-  mutation AddParticipant(
-    $bookingId: Int!
-    $userId: Int!
-  ) {
-    AddParticipant(
-      bookingId: $bookingId
-      userId: $userId
-    ) {
+  mutation AddParticipant($bookingId: Int!, $userId: Int!) {
+    AddParticipant(bookingId: $bookingId, userId: $userId) {
       success
       msg
       booking {
@@ -460,14 +436,8 @@ export const addParticipant_Mutation = gql`
 `;
 
 export const removeParticipant_Mutation = gql`
-  mutation RemoveParticipant(
-    $bookingId: Int!
-    $userId: Int!
-  ) {
-    RemoveParticipant(
-      bookingId: $bookingId
-      userId: $userId
-    ) {
+  mutation RemoveParticipant($bookingId: Int!, $userId: Int!) {
+    RemoveParticipant(bookingId: $bookingId, userId: $userId) {
       success
       msg
       booking {
@@ -501,16 +471,8 @@ export const removeParticipant_Mutation = gql`
 `;
 
 export const joinWaitlist_Mutation = gql`
-  mutation JoinWaitlist(
-    $roomId: Int!
-    $startTime: String!
-    $endTime: String!
-  ) {
-    JoinWaitlist(
-      roomId: $roomId
-      startTime: $startTime
-      endTime: $endTime
-    ) {
+  mutation JoinWaitlist($roomId: Int!, $startTime: String!, $endTime: String!) {
+    JoinWaitlist(roomId: $roomId, startTime: $startTime, endTime: $endTime) {
       success
       msg
       waitlist {

@@ -61,7 +61,7 @@ export default function RoomForm({ room, loading, onClose, onSubmit }: Props) {
               value={form.name}
               onChange={handleChangeInput}
               placeholder="Arctic Room"
-              required
+              // required
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[#18216B]"
             />
           </div>
@@ -80,7 +80,7 @@ export default function RoomForm({ room, loading, onClose, onSubmit }: Props) {
               onChange={handleChangeInput}
               placeholder="10"
               min="1"
-              required
+              // required
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[#18216B]"
             />
           </div>
@@ -98,7 +98,7 @@ export default function RoomForm({ room, loading, onClose, onSubmit }: Props) {
               value={form.floor}
               onChange={handleChangeInput}
               placeholder="2"
-              required
+              // required
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[#18216B]"
             />
           </div>
@@ -116,7 +116,7 @@ export default function RoomForm({ room, loading, onClose, onSubmit }: Props) {
               value={form.location}
               onChange={handleChangeInput}
               placeholder="North Wing"
-              required
+              // required
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[#18216B]"
             />
           </div>

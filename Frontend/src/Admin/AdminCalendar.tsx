@@ -25,7 +25,7 @@ export default function AdminCalendar() {
         endDate: end.toISOString(),
       },
     },
-  );
+  );  
   const events = useMemo(() => {
     if (!data?.AdminCalender) {
       return [];
@@ -75,8 +75,8 @@ export default function AdminCalendar() {
           initialView="dayGridMonth"
           headerToolbar={{
             left: "prev,next today",
-            center: "title",
-            right: "",
+            center: "",
+            right: "title",
           }}
           height="auto"
           events={events}
@@ -85,7 +85,7 @@ export default function AdminCalendar() {
               info.event.extendedProps.booking as Booking;
             setSelectedBooking(booking);
           }}
-        />
+        /> 
       </div>
       {selectedBooking && (
         <BookingDetail

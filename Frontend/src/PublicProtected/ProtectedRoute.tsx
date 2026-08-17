@@ -6,16 +6,13 @@ interface Props {
   allowedRole?: "EMPLOYEE" | "ADMIN";
 }
 export default function ProtectedRoute({ children, allowedRole }: Props) {
-  const { authUser, loading } = UseAuthContext();
-  console.log(authUser)
-
+  const { authUser,loading} = UseAuthContext();
   if (loading) {
-    return <h3>Loading...</h3>;
+    return null;
   }
   if (!authUser) {
     return <Navigate to="/login" replace />;
   }
-
   if (allowedRole && authUser.role !== allowedRole) {
     return <Navigate to={authUser.role === "ADMIN" ? "/admin" : "/"} replace />
   }

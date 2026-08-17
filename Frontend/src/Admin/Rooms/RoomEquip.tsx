@@ -11,13 +11,10 @@ interface Props {
 
 export default function RoomEquip({ room, onClose, handleRemoveEqu, handleAddEquip }: Props) {
   const { data } = useQuery<GetEquipment_Interface>(GetEquipment_Query);
-  console.log(room);
-  console.log(data);
   const eqips = data?.GetEquipments ?? [];
   const availEqups = eqips.filter(
     (eqip) => !room.equipments.some((asigneq) => asigneq.id === eqip.id)
   );
-  console.log(availEqups);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-lg rounded-lg bg-white shadow-xl">

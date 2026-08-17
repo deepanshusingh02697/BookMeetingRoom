@@ -36,6 +36,17 @@ export const resolvers = {
         where: { id: ctx.userId! },
       });
     },
+    Users: async (_parent: unknown, _args: unknown, ctx: Context) => {
+      isAuth(ctx);
+      return prisma.user.findMany({
+        where: {
+          role: "EMPLOYEE",
+        },
+        orderBy: {
+          firstname: "asc",
+        },
+      });
+    },
     MyBookings: async (_parent: unknown, _args: unknown, ctx: Context) => {
       isAuth(ctx);
       return prisma.booking.findMany({
@@ -51,6 +62,48 @@ export const resolvers = {
         orderBy: { startTime: "desc" },
       });
     },
+    MyMeetings: async (_parent: unknown, _args: unknown, ctx: Context) => {
+      isAuth(ctx);
+      const now = new Date();
+      return prisma.booking.findMany({
+        where: {
+          OR: [
+            {
+              organizerId: ctx.userId!,
+            },
+            {
+              participants: {
+                some: {
+                  userId: ctx.userId!,
+                },
+              },
+            },
+          ],
+          status: "CONFIRMED",
+          endTime: {
+            gte: now,
+          },
+        },
+        include: {
+          room: true,
+          organizer: true,
+          participants: {
+            include: {
+              user: true,
+            },
+          },
+          checkIn: {
+            include: {
+              user: true,
+            },
+          },
+        },
+        orderBy: {
+          startTime: "asc",
+        },
+      });
+    },
+
     BookingDetails: async (
       _parent: unknown,
       args: { id: number },
@@ -74,8 +127,11 @@ export const resolvers = {
 
       const organiser = booking.organizerId === ctx.userId;
       const admin = ctx.role === "ADMIN";
+      const participant = booking.participants.some(
+        (p) => p.userId === ctx.userId,
+      );
 
-      if (!organiser && !admin) {
+      if (!organiser && !participant && !admin) {
         throw new Error("You are not allowed to view this booking");
       }
       return booking;
@@ -174,7 +230,6 @@ export const resolvers = {
           stat.completedCount += 1;
         }
       }
-      console.log("value for the room things : ", roomThingsMap);
       return {
         totalBookings: bookings.length,
         totalCancelled: totalCancel,
@@ -245,34 +300,57 @@ export const resolvers = {
       return rooms;
     },
 
-    GetRooms:async(_parent:unknown,_args:unknown,ctx:Context)=>{
+    GetRooms: async (_parent: unknown, _args: unknown, ctx: Context) => {
       isAuth(ctx);
       return prisma.room.findMany({
-        include:{
-          roomEquipments:{
-            include:{equipment:true}
-          }
+        include: {
+          roomEquipments: {
+            include: { equipment: true },
+          },
         },
-        orderBy:{
-          id:"asc"
-        }
-      })
+        orderBy: {
+          id: "asc",
+        },
+      });
     },
-    GetRoomDetails:async(_parent:unknown,args:{roomId:number},ctx:Context)=>{
-      isAuth(ctx)
-      return prisma.room.findUnique({
-        where:{id:args.roomId},
-        include:{roomEquipments:{include:{equipment:true}}}
-      })
+    GetRoomDetails: async (
+      _parent: unknown,
+      args: { roomId: number },
+      ctx: Context,
+    ) => {
+      isAuth(ctx);
+      const room = await prisma.room.findUnique({
+        where: { id: args.roomId },
+        include: {
+          roomEquipments: { include: { equipment: true } },
+          bookings: {
+            where: { status: "CONFIRMED" },
+            include: { participants: true },
+          },
+        },
+      });
+      if (!room) {
+        throw new Error("Room not found");
+      }
+      const parCount = room.bookings.reduce(
+        (count, booking) => count + booking.participants.length,
+        0,
+      );
+
+      return {
+        ...room,
+        particiCount: parCount,
+        availableSpace: Math.max(room.capacity - parCount, 0),
+      };
     },
-    GetEquipments:async(_parent:unknown,_args:unknown,ctx:Context)=>{
+    GetEquipments: async (_parent: unknown, _args: unknown, ctx: Context) => {
       isAuth(ctx);
       return prisma.equipment.findMany({
-        orderBy:{
-          id:"asc"
-        }
-      })
-    }
+        orderBy: {
+          id: "asc",
+        },
+      });
+    },
   },
   Mutation: {
     SignUp: async (
@@ -423,6 +501,10 @@ export const resolvers = {
           checkIn: { include: { user: true } },
         },
       });
+      ctx.io.to(`user:${args.userId}`).emit("notify", {
+        message: "You are added to meeting",
+        bookingId: args.bookingId,
+      });
       return {
         success: true,
         msg: "Participant added successfully",
@@ -441,11 +523,13 @@ export const resolvers = {
       if (!booking) {
         throw new Error("Booking does not exist");
       }
-
+      if (booking.status !== "CONFIRMED") {
+        throw new Error("Can't remove participant");
+      }
       const organizer = booking.organizerId === ctx.userId;
       const admin = ctx.role === "ADMIN";
-
-      if (!organizer && !admin) {
+      const selfRemove = Number(args.userId) === Number(ctx.userId);
+      if (!organizer && !admin && !selfRemove) {
         throw new Error("Not authenticated to remove participat");
       }
 
@@ -477,9 +561,13 @@ export const resolvers = {
           checkIn: { include: { user: true } },
         },
       });
+      ctx.io.to(`user:${args.userId}`).emit("notify", {
+        message: "You are removed from meeting",
+        bookingId: args.bookingId,
+      });
       return {
         success: true,
-        msg: "Participant removed successfully",
+        msg: "Removed successfully",
         booking: updatedBooking,
       };
     },
@@ -697,7 +785,6 @@ export const resolvers = {
           },
         },
       });
-      console.log(checkData);
       if (!checkData) {
         throw new Error("Equipment is not assigned to this room");
       }
@@ -725,6 +812,49 @@ export const resolvers = {
         success: true,
         msg: "equipment removed succcessfully",
         room,
+      };
+    },
+    EditEquipment: async (
+      _parent: unknown,
+      args: { equipmentId: number; name?: string },
+      ctx: Context,
+    ) => {
+      isAdmin(ctx);
+      const equip = await prisma.equipment.findUnique({
+        where: {
+          id: args.equipmentId,
+        },
+      });
+      if (!equip) {
+        throw new Error("Equipment does not exist");
+      }
+      if (args.name?.trim() === undefined) {
+        throw new Error("Equipment name is required");
+      }
+      const name = checkName(args.name);
+      const existingEquipment = await prisma.equipment.findFirst({
+        where: {
+          name,
+          NOT: {
+            id: args.equipmentId,
+          },
+        },
+      });
+      if (existingEquipment) {
+        throw new Error("Equipment name already exists");
+      }
+      const updatedEquipment = await prisma.equipment.update({
+        where: {
+          id: args.equipmentId,
+        },
+        data: {
+          name,
+        },
+      });
+      return {
+        success: true,
+        msg: "Equipment updated successfully",
+        equipment: updatedEquipment,
       };
     },
 
@@ -767,7 +897,6 @@ export const resolvers = {
           args.recurringFreq,
           recuEndDate,
         );
-        console.log("occurence booking : ", occur);
         const recurrenceId = randomUUID();
         const bookings = await prisma.$transaction(
           async (tx) => {
@@ -782,12 +911,24 @@ export const resolvers = {
               });
               if (overlap) {
                 throw new Error(
-                  `Room is already booked on Date ${occ.start.toDateString()}`,
+                  `Room is already booked at ${occ.start.toLocaleString()}`,
+                );
+              }
+              const main = await tx.maintenance.findFirst({
+                where: {
+                  roomId: args.roomId,
+                  startTime: { lt: occ.end },
+                  endTime: { gt: occ.start },
+                },
+              });
+              if (main) {
+                throw new Error(
+                  `Room is under maintenance at ${occ.start.toLocaleString()}`,
                 );
               }
             }
             const created = [];
-            for (let occ of occur) {
+            for (const occ of occur) {
               const newBooking = await tx.booking.create({
                 data: {
                   roomId: args.roomId,
@@ -813,7 +954,7 @@ export const resolvers = {
               created.push(newBooking);
             }
             if (args.participantUserIds && args.participantUserIds.length > 0) {
-              for (let booking of created) {
+              for (const booking of created) {
                 await tx.participants.createMany({
                   data: args.participantUserIds.map((userId) => ({
                     bookingId: booking.id,
@@ -839,6 +980,14 @@ export const resolvers = {
           },
           { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
         );
+        if (bookings.length > 0 && args.participantUserIds) {
+          for (const userId of args.participantUserIds) {
+            ctx.io.to(`user:${userId}`).emit("notify", {
+              message: `You are added to "${bookings[0]?.title}".`,
+              bookingId: bookings[0]?.id,
+            });
+          }
+        }
         return {
           success: true,
           msg: `${bookings.length} recurring bookings created successfully`,
@@ -848,6 +997,7 @@ export const resolvers = {
 
       const booking = await prisma.$transaction(
         async (tx) => {
+          //Admin maintenance create karega, agar us time booking already hai then maintenance create nahi hogi.
           const overlap = await tx.booking.findFirst({
             where: {
               roomId: args.roomId,
@@ -858,6 +1008,19 @@ export const resolvers = {
           });
           if (overlap) {
             throw new Error("Room already booked for this time");
+          }
+
+          const maint = await tx.maintenance.findFirst({
+            where: {
+              roomId: args.roomId,
+              startTime: { lt: end },
+              endTime: { gt: start },
+            },
+          });
+          if (maint) {
+            throw new Error(
+              `Room is under maintenance from ${maint.startTime.toLocaleString()} to ${maint.endTime.toLocaleString()}`,
+            );
           }
           const newbooking = await tx.booking.create({
             data: {
@@ -895,6 +1058,14 @@ export const resolvers = {
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
+      if (booking && args.participantUserIds) {
+        for (const userId of args.participantUserIds) {
+          ctx.io.to(`user:${userId}`).emit("notify", {
+            message: `You are added to "${booking.title}".`,
+            bookingId: booking.id,
+          });
+        }
+      }
       return {
         success: true,
         msg: "booking created successfully",
@@ -919,6 +1090,19 @@ export const resolvers = {
       if (!organiser && !admin) {
         throw new Error("Not allowed to cancel booking");
       }
+
+      if (booking.status !== "CONFIRMED") {
+        throw new Error("Only confirmed bookings can be cancel");
+      }
+      const now = new Date();
+      const oneHour = new Date(booking.startTime.getTime() - 60 * 60 * 1000);
+
+      if (now >= oneHour) {
+        throw new Error(
+          "Booking can't be cancelled 1 hour before start meeting",
+        );
+      }
+
       const cancel = await prisma.booking.update({
         where: { id: args.id },
         data: { status: "CANCELLED" },
@@ -995,6 +1179,16 @@ export const resolvers = {
       });
       if (!overlapping) {
         throw new Error("no need to join waitlist, room is free");
+      }
+      const maint = await prisma.maintenance.findFirst({
+        where: {
+          roomId: args.roomId,
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+      });
+      if (maint) {
+        throw new Error("Room is under maintenance for this time");
       }
       const checkExist = await prisma.waitlistEntry.findUnique({
         where: {
@@ -1103,24 +1297,19 @@ export const resolvers = {
           checkIn: null,
         },
       });
-      console.log("time overdue that 10 min : ", overdueBks);
-
-      for (let booking of overdueBks) {
+      for (const booking of overdueBks) {
         await prisma.booking.update({
           where: { id: booking.id },
           data: { status: "NO_SHOW" },
         });
-
-        await convertWeightlist(
-          booking.roomId,
-          booking.startTime,
-          booking.endTime,
-        );
       }
       await prisma.booking.updateMany({
         where: {
           status: "CONFIRMED",
           endTime: { lte: now },
+          checkIn: {
+            isNot: null,
+          },
         },
         data: { status: "COMPLETED" },
       });

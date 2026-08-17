@@ -11,6 +11,7 @@ import {
   createMaintenance_Mutation,
   deleteMaintenance_Mutation,
 } from "../../graphql/Mutation";
+import { toast } from "react-toastify";
 
 interface Props {
   room: RoomInterface;
@@ -37,7 +38,6 @@ export default function RoomMaint({ room, onClose }: Props) {
     reason: "",
   });
   const maintenances = data?.RoomMaintinance ?? [];
-  console.log(maintenances);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -72,7 +72,18 @@ export default function RoomMaint({ room, onClose }: Props) {
 
       setShowForm(false);
     } catch (error) {
-      console.error(error);
+      const err= error instanceof Error
+      if(err){
+        toast(error.message,{
+          theme:"colored",
+          type:"error",
+        })
+      }else{
+        toast("Faild to submit",{
+          theme:"colored",
+          type:"error",
+        })
+      }
     }
   };
   const handleDelete = async (id: string) => {
@@ -84,7 +95,18 @@ export default function RoomMaint({ room, onClose }: Props) {
       });
       await refetch();
     } catch (error) {
-      console.error(error);
+      const err= error instanceof Error
+      if(err){
+        toast(error.message,{
+          theme:"colored",
+          type:"error",
+        })
+      }else{
+        toast("Faild to delete",{
+          theme:"colored",
+          type:"error",
+        })
+      }
     }
   };
   return (

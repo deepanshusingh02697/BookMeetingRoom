@@ -23,12 +23,14 @@ import type {
 } from "../../graphql/Client";
 import RoomEquip from "./RoomEquip";
 import RoomMaint from "./RoomMaint";
+import { toast } from "react-toastify";
 
 export default function AdminRooms() {
   const [showForm, setShowForm] = useState(false);
   const [editRoom, setEditRoom] = useState<RoomInterface | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<RoomInterface | null>(null);
-  const [selectedMainRoom, setSelectedMainRoom] = useState<RoomInterface | null>(null);
+  const [selectedMainRoom, setSelectedMainRoom] =
+    useState<RoomInterface | null>(null);
 
   const { data, loading, error, refetch } =
     useQuery<GetRooms_Interface>(GetRooms_Query);
@@ -37,7 +39,8 @@ export default function AdminRooms() {
     useMutation<CreateRoom_Interface>(createRoom_Mutation);
   const [UpdateRoom, { loading: updateLoading }] =
     useMutation<UpdateRoom_Interface>(updateRoom_Mutation);
-  const [DisableRoom] =useMutation<DisableRoom_Interface>(disableRoom_Mutation);
+  const [DisableRoom] =
+    useMutation<DisableRoom_Interface>(disableRoom_Mutation);
   const [EnableRoom] = useMutation<EnableRoom_Interface>(enableRoom_Mutation);
 
   const [RemoveEquip] = useMutation<RemoveEquromRoom_Interface>(
@@ -70,7 +73,21 @@ export default function AdminRooms() {
       setShowForm(false);
       setEditRoom(null);
     } catch (error) {
-      console.error(error);
+      const err = error instanceof Error;
+      if (err) {
+        toast(error.message || "Fields required correctly", {
+          type: "error",
+          theme: "colored",
+        });
+        return;
+      } else {
+        toast("Something wrong, try again", {
+          position: "top-right",
+          type: "error",
+          theme: "colored",
+        });
+        return;
+      }
     }
   };
   const handleEdit = (room: RoomInterface) => {
@@ -93,18 +110,28 @@ export default function AdminRooms() {
           },
         });
       }
-
       await refetch();
     } catch (error) {
-      console.error(error);
+      const err= error instanceof Error
+      if(err){
+        toast(error.message,{
+          theme:"colored",
+          type:"error",
+        })
+      }else{
+        toast("Faild to status change",{
+          theme:"colored",
+          type:"error",
+        })
+      }
     }
   };
   const handleManageEquip = async (room: RoomInterface) => {
     setSelectedRoom(room);
   };
-  const handlManageMain = async(room:RoomInterface)=>{
-    setSelectedMainRoom(room)
-  }
+  const handlManageMain = async (room: RoomInterface) => {
+    setSelectedMainRoom(room);
+  };
   const handleRemoveEquip = async (eqip: { id: string; name: string }) => {
     if (!selectedRoom) return;
     try {
@@ -122,7 +149,18 @@ export default function AdminRooms() {
         setSelectedRoom(updatedRoom);
       }
     } catch (error) {
-      console.error(error);
+      const err= error instanceof Error
+      if(err){
+        toast(error.message,{
+          theme:"colored",
+          type:"error",
+        })
+      }else{
+        toast("Faild to remove equipment",{
+          theme:"colored",
+          type:"error",
+        })
+      }
     }
   };
   const handleAddEquipment = async (eqip: { id: string; name: string }) => {
@@ -142,7 +180,18 @@ export default function AdminRooms() {
         setSelectedRoom(udpateRoom);
       }
     } catch (error) {
-      console.error(error);
+      const err= error instanceof Error
+      if(err){
+        toast(error.message,{
+          theme:"colored",
+          type:"error",
+        })
+      }else{
+        toast("Faild to add equipment",{
+          theme:"colored",
+          type:"error",
+        })
+      }
     }
   };
   if (loading) {
@@ -204,7 +253,10 @@ export default function AdminRooms() {
         />
       )}
       {selectedMainRoom && (
-        <RoomMaint room={selectedMainRoom} onClose={()=>setSelectedMainRoom(null)}/>
+        <RoomMaint
+          room={selectedMainRoom}
+          onClose={() => setSelectedMainRoom(null)}
+        />
       )}
     </div>
   );

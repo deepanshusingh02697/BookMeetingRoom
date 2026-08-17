@@ -1,9 +1,14 @@
 import type { GetEquipment_Interface } from "../../graphql/Client";
+
 interface Props {
   equipments: GetEquipment_Interface["GetEquipments"];
+  onEdit: (
+    equipment: GetEquipment_Interface["GetEquipments"][number]
+  ) => void;
 }
 export default function EquipmentTable({
-  equipments
+  equipments,
+  onEdit,
 }: Props) {
   return (
     <div className="overflow-hidden rounded-lg border bg-white">
@@ -14,43 +19,39 @@ export default function EquipmentTable({
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 ID
               </th>
+
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 Equipment Name
               </th>
+
               <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
                 Actions
               </th>
             </tr>
           </thead>
+
           <tbody>
-            {equipments.map((equipment, index) => (
+            {equipments.map((eq, idx) => (
               <tr
-                key={equipment.id}
+                key={eq.id}
                 className="border-b last:border-b-0"
               >
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {index + 1}
+                  {idx + 1}
                 </td>
+
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                  {equipment.name}
+                  {eq.name}
                 </td>
+
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-center gap-3">
                     <button
                       type="button"
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                      onClick={() => onEdit(eq)}
+                      className="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200"
                     >
-                      <span className="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                        EDIT
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100"
-                    >
-                      <span className="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
-                        DELETE
-                      </span>
+                      EDIT
                     </button>
                   </div>
                 </td>

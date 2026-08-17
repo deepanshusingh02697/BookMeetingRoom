@@ -7,8 +7,8 @@ export default function BookingDetail({
   booking,
   onClose,
 }: Props) {
-  const start = new Date(booking.startTime);
-  const end = new Date(booking.endTime);
+  const start = new Date(Number(booking.startTime));
+  const end = new Date(Number(booking.endTime));
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
@@ -62,11 +62,13 @@ export default function BookingDetail({
               {start.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
+                hour12:true
               })}
               {" - "}
               {end.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
+                hour12:true
               })}
             </p>
           </div>
@@ -93,7 +95,7 @@ export default function BookingDetail({
                 No participants
               </p>
             ) : (
-              <div className="mt-2 space-y-2">
+              <div className="mt-2 max-h-39 overflow-y-auto space-y-2">
                 {booking.participants.map((participant) => (
                   <div
                     key={participant.id}
@@ -128,9 +130,7 @@ export default function BookingDetail({
             </p>
             <p className="mt-1 text-sm">
               {booking.checkIn
-                ? `Checked in at ${new Date(
-                    booking.checkIn.checkedInAt
-                  ).toLocaleTimeString()}`
+                ? `Checked in at ${new Date(booking.checkIn.checkedInAt).toLocaleTimeString()}`
                 : "Not checked in"}
             </p>
           </div>

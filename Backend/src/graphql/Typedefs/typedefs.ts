@@ -40,6 +40,8 @@ type Room {
   floor: Int!
   location: String!
   status: RoomStatus!
+  particiCount:Int!
+  availableSpace:Int!
   equipments: [Equipment!]!
 }
 
@@ -160,6 +162,7 @@ type MaintinancePayload{
 
 type Query {
   CurrUser:User!
+  Users:[User!]!
   SearchRooms(
     startTime: String!
     endTime: String!
@@ -169,6 +172,8 @@ type Query {
   ): [Room!]!
 
   MyBookings: [Booking!]!
+  MyMeetings: [Booking!]!
+  
   BookingDetails(id: Int!): Booking
 
   MyWaitlist:[WaitlistEntry!]!
@@ -237,7 +242,10 @@ type Mutation {
     roomId: Int!
     equipmentId: Int!
   ): RoomPayload!
-
+  EditEquipment(
+    equipmentId:Int!
+    name:String
+  ):EquipmentPayload!
 
   CreateBooking(
     roomId: Int!

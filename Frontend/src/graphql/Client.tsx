@@ -9,6 +9,15 @@ export interface CurrUser_Interface {
     updatedAt: string;
   } | null;
 }
+export interface Users_Interface {
+  Users: {
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    role: "EMPLOYEE" | "ADMIN";
+  }[];
+}
 
 export interface SignUp_Interface {
   SignUp: {
@@ -98,11 +107,13 @@ export interface GetRoomDeatils_Interface {
     floor: number;
     location: string;
     status: string;
+    particiCount: number;
+    availableSpace: number;
     equipments: {
       id: string;
       name: string;
     }[];
-  }|null;
+  } | null;
 }
 export interface CreateRoom_Interface {
   CreateRoom: {
@@ -214,6 +225,15 @@ export interface RemoveEquromRoom_Interface {
     } | null;
   };
 }
+export interface udpateEquipment_Interface {
+  EditEquipment: {
+    equipment: {
+      id: string;
+    };
+    msg: string;
+    success: boolean;
+  };
+}
 
 export interface CreateBooking_Interface {
   CreateBooking: {
@@ -287,9 +307,6 @@ export interface CancelBooking_Interface {
       };
     } | null;
   };
-}
-export interface CancelRecurringBooking_Interface {
-  CancelRecurringBooking: string;
 }
 
 export interface AddParticipant_Interface {
@@ -563,6 +580,95 @@ export interface BookingDetails_Interface {
       };
     } | null;
   } | null;
+}
+
+export interface MyMeetings_Interface {
+  MyMeetings: {
+    id: string;
+    roomId: string;
+    organizerId: string;
+
+    title: string;
+    description: string | null;
+
+    startTime: string;
+    endTime: string;
+
+    status:
+      | "CONFIRMED"
+      | "CANCELLED"
+      | "COMPLETED"
+      | "NO_SHOW";
+
+    isRecurring: boolean;
+
+    recurrenceRule: {
+      frequency: "DAILY" | "WEEKLY";
+      endDate: string | null;
+    } | null;
+
+    recurrenceId: string | null;
+
+    createdAt: string;
+
+    room: {
+      id: string;
+      name: string;
+      capacity: number;
+      floor: number;
+      location: string;
+
+      status: "AVAILABLE" | "DISABLED";
+
+      equipments: {
+        id: string;
+        name: string;
+      }[];
+    };
+
+    organizer: {
+      id: string;
+      firstname: string;
+      lastname: string;
+      email: string;
+      role: "EMPLOYEE" | "ADMIN";
+      createdAt: string;
+      updatedAt: string;
+    };
+
+    participants: {
+      id: string;
+      bookingId: string;
+      userId: string;
+
+      user: {
+        id: string;
+        firstname: string;
+        lastname: string;
+        email: string;
+        role: "EMPLOYEE" | "ADMIN";
+        createdAt: string;
+        updatedAt: string;
+      };
+    }[];
+
+    checkIn: {
+      id: string;
+      bookingId: string;
+      checkInBy: string;
+      checkedInAt: string;
+
+      user: {
+        id: string;
+        firstname: string;
+        lastname: string;
+        email: string;
+        role: "EMPLOYEE" | "ADMIN";
+        createdAt: string;
+        updatedAt: string;
+      };
+    } | null;
+  }[];
 }
 
 export interface MyWaitlist_Interface {

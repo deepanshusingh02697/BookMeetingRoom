@@ -140,7 +140,7 @@ export default function Rooms() {
             className="flex items-center gap-2 rounded-md bg-[#18216B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#121952] disabled:opacity-50"
           >
             <FiSearch />
-            {searchLoading ? "searching..." : "find available rooms"}
+            find available rooms
           </button>
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function Rooms() {
                   </div>
                 </div>
                 {room.equipments?.length > 0 ? (
-                  <div className="mt-4">
+                  <div className="my-4">
                     <p className="text-xs font-medium text-gray-500">
                       Equipment
                     </p>
@@ -239,7 +239,7 @@ export default function Rooms() {
                     </div>
                   </div>
                 ) : (
-                  <div className="my-5 h-[42px]" />
+                  <div className="my-4 h-[42px]" />
                 )}
                 <Link
                   to={`/rooms/${room.id}`}

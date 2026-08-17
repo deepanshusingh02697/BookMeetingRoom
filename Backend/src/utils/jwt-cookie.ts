@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import type { Response } from "express";
 const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
 if (!ACCESS_SECRET) {
   throw new Error("Secret not provided key for generating access and refresh token");
@@ -19,7 +19,7 @@ export const accessCookieOptions = {
   maxAge: 1000 * 60 * 60 * 24 * 7,
 };
 
-export const setToken = (res: any, userId: number, role: Role) => {
+export const setToken = (res: Response, userId: number, role: Role) => {
   const accessToken = signAccessToken(userId, role);
   res.cookie("accessToken", accessToken, accessCookieOptions);
 };

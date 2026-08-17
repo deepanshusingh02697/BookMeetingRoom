@@ -16,6 +16,9 @@ import RoomDetails from "./Employee/RoomDetails";
 import Rooms from "./Employee/Rooms";
 import MyBookings from "./Employee/MyBookings";
 import CreateBooking from "./Employee/CreateBooking";
+import MyWaitlist from "./Employee/MyWaitlist";
+import MyMeetings from "./Employee/Meeting/MyMeetings";
+import MeetingDetails from "./Employee/Meeting/MeetingDetails";
 export default function App() {
   return (
     <>
@@ -45,8 +48,13 @@ export default function App() {
           <Route path="rooms/:roomId" element={<RoomDetails />} />
           <Route path="rooms/:roomId/book" element={<CreateBooking />} />
 
+          <Route path="/waitlist" element={<MyWaitlist/>}/>
+
           <Route path="bookings" element={<MyBookings />} />
           <Route path="bookings/:bookingId" element={<BookingDetails />} />
+
+          <Route path="meetings" element={<MyMeetings />} />
+          <Route path="meetings/:meetingId" element={<MeetingDetails />} />
         </Route>
 
         <Route

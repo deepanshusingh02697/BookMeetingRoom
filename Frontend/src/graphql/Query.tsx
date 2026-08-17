@@ -13,6 +13,17 @@ export const currentUser_Query = gql`
     }
   }
 `;
+export const users_Query = gql`
+  query Users {
+    Users {
+      id
+      firstname
+      lastname
+      email
+      role
+    }
+  }
+`;
 export const GetRooms_Query = gql`
   query GetRooms {
     GetRooms {
@@ -38,6 +49,8 @@ export const GetRoomDetails_Query = gql`
       floor
       location
       status
+      particiCount
+      availableSpace
       equipments {
         id
         name
@@ -287,6 +300,81 @@ export const recurringBookingGroup_Query = gql`
         bookingId
         checkInBy
         checkedInAt
+        user {
+          id
+          firstname
+          lastname
+          email
+          role
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
+export const MyMeetings_Query = gql`
+  query MyMeetings {
+    MyMeetings {
+      id
+      roomId
+      organizerId
+      title
+      description
+      startTime
+      endTime
+      status
+      isRecurring
+      recurrenceRule
+      recurrenceId
+      createdAt
+
+      room {
+        id
+        name
+        capacity
+        floor
+        location
+        status
+        equipments {
+          id
+          name
+        }
+      }
+
+      organizer {
+        id
+        firstname
+        lastname
+        email
+        role
+        createdAt
+        updatedAt
+      }
+
+      participants {
+        id
+        bookingId
+        userId
+
+        user {
+          id
+          firstname
+          lastname
+          email
+          role
+          createdAt
+          updatedAt
+        }
+      }
+
+      checkIn {
+        id
+        bookingId
+        checkInBy
+        checkedInAt
+
         user {
           id
           firstname

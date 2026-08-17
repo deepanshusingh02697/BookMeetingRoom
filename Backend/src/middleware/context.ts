@@ -1,21 +1,22 @@
 import { Request, Response } from "express";
 import { verifyAccessToken } from "../utils/jwt-cookie";
+import { Server } from "socket.io";
 
 export type Context = {
   userId: number | null;
   req: Request;
   res: Response;
   role: "EMPLOYEE" | "ADMIN" | null;
+  io:Server;
 };
 
-export const createCheckAuth = async ({
+export const createCheckAuth = (io:Server)=>async ({
   req,
   res,
 }: {
   req: Request;
   res: Response;
 }): Promise<Context> => {
-  console.log("COOKIES:", req.cookies);
   let userId: number | null = null;
   let role: Context["role"] = null;
 
@@ -26,9 +27,9 @@ export const createCheckAuth = async ({
       const decoded = verifyAccessToken(accessToken);
       userId = decoded.userId;
       role = decoded.role;
-    } catch (error) {
+    } catch (_error) {
       userId = null;
     }
   }
-  return { req, res, userId, role };
+  return { req, res, userId, role,io };
 };

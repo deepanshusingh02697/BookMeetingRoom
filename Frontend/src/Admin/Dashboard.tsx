@@ -1,5 +1,11 @@
-import { useQuery } from "@apollo/client/react";
-import { FiCalendar, FiXCircle, FiUserX, FiHome } from "react-icons/fi";
+import { useMutation, useQuery } from "@apollo/client/react";
+import {
+  FiCalendar,
+  FiXCircle,
+  FiUserX,
+  FiHome,
+  FiRefreshCw,
+} from "react-icons/fi";
 import {
   adminCalendar_Query,
   currentUser_Query,
@@ -8,8 +14,10 @@ import {
 import type {
   AdminCalender_Interface,
   CurrUser_Interface,
+  ReleaseBooking_Interface,
   UsedAnalytics_Interface,
 } from "../graphql/Client";
+import { releaseBooking_Mutation } from "../graphql/Mutation";
 
 function getTodayRange() {
   const now = new Date();
@@ -26,6 +34,7 @@ function formatTime(date: string) {
   return new Date(Number(date)).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12:true
   });
 }
 export default function Dashboard() {
@@ -46,10 +55,45 @@ export default function Dashboard() {
         endDate,
       },
     });
+  const [releaseBooking, { loading: releaseLoading }] =
+    useMutation<ReleaseBooking_Interface>(releaseBooking_Mutation, {
+      refetchQueries: [
+        {
+          query: adminCalendar_Query,
+          variables: {
+            startDate,
+            endDate,
+          },
+        },
+        {
+          query: usedAnalytics_Query,
+          variables: {
+            startDate,
+            endDate,
+          },
+        },
+      ],
+    });
   const user = userData?.CurrUser;
   const bookings = bookingData?.AdminCalender ?? [];
   const analytics = analyticsData?.UsedAnalytics;
-  const loading = userLoading || bookingLoading || analyticsLoading
+  const handleReleaseBookings = async () => {
+    const confirmed = window.confirm(
+      "Do you want to release expired bookings? ",
+    );
+    if (!confirmed) return;
+    try {
+      const result = await releaseBooking();
+      alert(result.data?.ReleaseBooking || "Bookings released successfully");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Failed to release bookings");
+      }
+    }
+  };
+  const loading = userLoading || bookingLoading || analyticsLoading;
   if (loading) {
     return (
       <div className="p-5 text-sm text-gray-500">Loading dashboard...</div>
@@ -64,6 +108,17 @@ export default function Dashboard() {
         <p className="mt-1 text-sm text-gray-500">
           Here's what's happening today.
         </p>
+        {user?.role === "ADMIN" && (
+          <button
+            type="button"
+            onClick={handleReleaseBookings}
+            disabled={releaseLoading}
+            className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#18216B] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#252d80] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <FiRefreshCw />
+            {releaseLoading ? "Releasing..." : "Release Bookings"}
+          </button>
+        )}
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
@@ -127,8 +182,8 @@ export default function Dashboard() {
                           {booking.room.name} - {booking.room.location}
                         </p>
                         <p className="mt-1 text-xs text-gray-500">
-                          {formatTime(booking.startTime)} -{" "}
-                          {formatTime(booking.endTime)}
+                          {formatTime(booking.startTime).toUpperCase()} -{" "}
+                          {formatTime(booking.endTime).toUpperCase()}
                         </p>
                       </div>
                       <span
@@ -143,7 +198,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div className="rounded-md border bg-white p-5 shadow-sm">
+        <div className="h-fit lg:sticky lg:top-5 rounded-md border bg-white p-5 shadow-sm">
           <div className="mb-4">
             <h3 className="font-semibold text-gray-900">Room Usage</h3>
             <p className="mt-1 text-xs text-gray-500">
@@ -164,7 +219,7 @@ export default function Dashboard() {
                   <div>
                     <p className="text-sm font-medium">{item.room.name}</p>
                     <p className="text-xs text-gray-500">
-                      Floor {item.room.floor} · Capacity {item.room.capacity}
+                      Floor {item.room.floor} - Capacity {item.room.capacity}
                     </p>
                   </div>
                   <div className="text-right">
@@ -182,7 +237,11 @@ export default function Dashboard() {
     </div>
   );
 }
-function DashboardCard({title,value,icon}: {
+function DashboardCard({
+  title,
+  value,
+  icon,
+}: {
   title: string;
   value: number;
   icon: React.ReactNode;
@@ -199,4 +258,3 @@ function DashboardCard({title,value,icon}: {
     </div>
   );
 }
-
