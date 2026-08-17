@@ -19,6 +19,7 @@ import {
 } from "../../Validation/room.validation";
 import {
   buildRecurDates,
+  checkBookingTime,
   checkIn_Min,
   checkInAllow,
   checkTime,
@@ -873,7 +874,7 @@ export const resolvers = {
       ctx: Context,
     ) => {
       isAuth(ctx);
-      const { start, end } = checkTime(args.startTime, args.endTime);
+      const { start, end } = checkBookingTime(args.startTime, args.endTime);
       const title = checkTitle(args.title);
       const room = await prisma.room.findUnique({ where: { id: args.roomId } });
       if (!room) {

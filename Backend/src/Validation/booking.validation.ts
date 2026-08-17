@@ -15,7 +15,18 @@ export const checkTime = (startTime: string, endTime: string) => {
   }
   return { start, end };
 };
-
+export const checkBookingTime = (startTime: string, endTime: string) => {
+  const { start, end } = checkTime(startTime, endTime);
+  if (start <= new Date()) {
+    throw new GraphQLError("Booking cannot be in the past", {
+      extensions: {
+        code: "BAD_INPUT",
+        field: "startTime",
+      },
+    });
+  }
+  return { start, end };
+};
 export const checkTitle = (title: string) => {
   const trimmed = title.trim();
   if (trimmed.length < 3) {
