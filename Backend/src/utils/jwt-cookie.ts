@@ -13,8 +13,8 @@ const signAccessToken = (userId: number, role: Role) => {
 
 export const accessCookieOptions = {
   httpOnly: true,
-  secure: false,//true
-  sameSite: "lax" as const,//"none"
+  secure: true,//false
+  sameSite: "none" as const,//"lax"
   path: "/",
   maxAge: 1000 * 60 * 60 * 24 * 7,
 };
