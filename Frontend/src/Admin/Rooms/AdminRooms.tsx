@@ -24,6 +24,7 @@ import type {
 import RoomEquip from "./RoomEquip";
 import RoomMaint from "./RoomMaint";
 import { toast } from "react-toastify";
+import Loader from "../../Component/Loader";
 
 export default function AdminRooms() {
   const [showForm, setShowForm] = useState(false);
@@ -195,7 +196,7 @@ export default function AdminRooms() {
     }
   };
   if (loading) {
-    return <div className="p-5 text-sm text-gray-500">Loading rooms...</div>;
+    return <Loader/>
   }
   if (error) {
     return (
