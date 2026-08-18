@@ -172,9 +172,9 @@ export default function Login() {
           ...prev,
           [frontendField]: message,
         }));
-        if(frontendField==="email"){
+        if (frontendField === "email") {
           emailRef.current?.focus();
-        }else if(frontendField==="password"){
+        } else if (frontendField === "password") {
           passwordRef.current?.focus();
         }
       } else if (error instanceof Error) {
@@ -332,16 +332,6 @@ export default function Login() {
             <p className="mt-1 text-xs text-red-500">{error.password}</p>
           )}
         </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            className="text-xs text-blue-600 hover:underline"
-          >
-            Forgot password?
-          </button>
-        </div>
-
         <button
           type="submit"
           disabled={loading}
@@ -363,7 +353,7 @@ export default function Login() {
       </p>
 
       <p className="mt-3 text-center text-xs text-gray-500">
-        &copy; {new Date().getFullYear()} Employee Management System
+        &copy; {new Date().getFullYear()} Room Meeting Intelligence
       </p>
     </div>
   );
