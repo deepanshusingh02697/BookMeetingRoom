@@ -1,10 +1,10 @@
-import { ApolloClient, HttpLink } from '@apollo/client'
-import { InMemoryCache } from '@apollo/client'
+import { ApolloClient, HttpLink } from "@apollo/client";
+import { InMemoryCache } from "@apollo/client";
 
-const httpLink=new HttpLink({
-  uri:"http://localhost:4002/graphql",
+const httpLink = new HttpLink({
+  uri: "https://bookmeetingroom-73rz.onrender.com/graphql",
   credentials: "include",
-})
+});
 export const apolloClient = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache(),
