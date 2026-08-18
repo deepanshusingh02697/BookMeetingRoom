@@ -18,6 +18,7 @@ import type {
   UsedAnalytics_Interface,
 } from "../graphql/Client";
 import { releaseBooking_Mutation } from "../graphql/Mutation";
+import Loader from "../Component/Loader";
 
 function getTodayRange() {
   const now = new Date();
@@ -34,7 +35,7 @@ function formatTime(date: string) {
   return new Date(Number(date)).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-    hour12:true
+    hour12: true,
   });
 }
 export default function Dashboard() {
@@ -95,9 +96,7 @@ export default function Dashboard() {
   };
   const loading = userLoading || bookingLoading || analyticsLoading;
   if (loading) {
-    return (
-      <div className="p-5 text-sm text-gray-500">Loading dashboard...</div>
-    );
+    return <Loader />;
   }
   return (
     <div>

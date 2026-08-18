@@ -8,6 +8,7 @@ import type {
   BookingDetails_Interface,
 } from "../graphql/Client";
 import { useQuery } from "@apollo/client/react";
+import Loader from "../Component/Loader";
 
 type Booking = NonNullable<BookingDetails_Interface["BookingDetails"]>;
 export default function AdminCalendar() {
@@ -42,9 +43,7 @@ export default function AdminCalendar() {
   }, [data]);
   if (loading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
-        <p className="text-gray-500">Loading calendar...</p>
-      </div>
+      <Loader/>
     );
   }
   if (error) {
