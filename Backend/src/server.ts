@@ -17,13 +17,13 @@ const port = process.env.PORT || 4003;
 const httpServer = createServer(app);
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://bookmeetingroom-client.onrender.com"],
     credentials: true,
   }),
 );
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://bookmeetingroom-client.onrender.com"],
     credentials: true,
   },
   transports: ["websocket", "polling"],
