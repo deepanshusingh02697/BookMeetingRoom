@@ -47,7 +47,13 @@ export default function Rooms() {
       });
       setSearched(true);
     } catch (error) {
-      console.log(error);
+      const err=error instanceof Error
+      if(err){
+        toast(error.message || "Failed to search",{
+          type:"error",
+          theme:"colored"
+        })
+      }
     }
   };
   const handleShowAllRooms = () => {

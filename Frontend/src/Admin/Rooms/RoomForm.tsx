@@ -28,12 +28,25 @@ export default function RoomForm({ room, loading, onClose, onSubmit }: Props) {
   };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({
-      name: form.name,
-      capacity: Number(form.capacity),
-      floor: Number(form.floor),
-      location: form.location,
-    });
+    const name = form.name.trim();
+    const location = form.location.trim();
+    if(!name ||!location) return
+    if (!form.capacity.trim()) {
+      return;
+    }
+    if (!form.floor.trim()) {
+      return;
+    }
+    const capacity = Number(form.capacity);
+    const floor = Number(form.floor);
+    if (!Number.isInteger(capacity) || capacity < 1) {
+      return;
+    }
+
+    if (!Number.isInteger(floor) || floor < 1) {
+      return;
+    }
+    onSubmit({name,location,capacity,floor});
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

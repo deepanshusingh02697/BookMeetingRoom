@@ -248,11 +248,6 @@ export interface CreateBooking_Interface {
       startTime: string;
       endTime: string;
       status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
-      isRecurring: boolean;
-      recurrenceRule: {
-        frequency: "DAILY" | "WEEKLY";
-        endDate: string | null;
-      } | null;
       recurrenceId: string | null;
       createdAt: string;
       room: {
@@ -401,9 +396,6 @@ export interface CheckInToBooking_Interface {
     } | null;
   };
 }
-export interface ReleaseBooking_Interface {
-  ReleaseBooking: string;
-}
 
 export interface RoomMaintinance_Interface {
   RoomMaintinance: {
@@ -464,11 +456,6 @@ export interface MyBookings_Interface {
     startTime: string;
     endTime: string;
     status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
-    isRecurring: boolean;
-    recurrenceRule: {
-      frequency: "DAILY" | "WEEKLY";
-      endDate: string | null;
-    } | null;
     recurrenceId: string | null;
     createdAt: string;
     room: {
@@ -528,11 +515,6 @@ export interface BookingDetails_Interface {
     startTime: string;
     endTime: string;
     status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
-    isRecurring: boolean;
-    recurrenceRule: {
-      frequency: "DAILY" | "WEEKLY";
-      endDate: string | null;
-    } | null;
     recurrenceId: string | null;
     createdAt: string;
     room: {
@@ -599,13 +581,6 @@ export interface MyMeetings_Interface {
       | "CANCELLED"
       | "COMPLETED"
       | "NO_SHOW";
-
-    isRecurring: boolean;
-
-    recurrenceRule: {
-      frequency: "DAILY" | "WEEKLY";
-      endDate: string | null;
-    } | null;
 
     recurrenceId: string | null;
 
@@ -707,11 +682,6 @@ export interface RecurringBookingGroup_Interface {
     startTime: string;
     endTime: string;
     status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
-    isRecurring: boolean;
-    recurrenceRule: {
-      frequency: "DAILY" | "WEEKLY";
-      endDate: string | null;
-    } | null;
     recurrenceId: string | null;
     createdAt: string;
     room: {
@@ -763,11 +733,6 @@ export interface AdminCalender_Interface {
     startTime: string;
     endTime: string;
     status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
-    isRecurring: boolean;
-    recurrenceRule: {
-      frequency: "DAILY" | "WEEKLY";
-      endDate: string | null;
-    } | null;
     recurrenceId: string | null;
     createdAt: string;
     room: {

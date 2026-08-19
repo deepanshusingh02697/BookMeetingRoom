@@ -59,16 +59,30 @@ export default function AdminRooms() {
   }) => {
     try {
       if (editRoom) {
-        await UpdateRoom({
+        const {data}=await UpdateRoom({
           variables: {
             id: Number(editRoom.id),
             ...form,
           },
         });
+        if(!data?.UpdateRoom?.success){
+          toast(data?.UpdateRoom?.msg||"fail to update room",{
+            type:"error",
+            theme:"colored"
+          })
+          return
+        }
       } else {
-        await CreateRoom({
+        const { data } = await CreateRoom({
           variables: form,
         });
+        if(!data?.CreateRoom?.success){
+          toast(data?.CreateRoom?.msg || "fail to create room",{
+            type:"error",
+            theme:"colored"
+          })
+          return
+        }
       }
       await refetch();
       setShowForm(false);

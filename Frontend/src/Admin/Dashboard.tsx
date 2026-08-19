@@ -1,23 +1,17 @@
-import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  FiCalendar,
-  FiXCircle,
-  FiUserX,
-  FiHome,
-  FiRefreshCw,
-} from "react-icons/fi";
+import { useQuery } from "@apollo/client/react";
+import { FiCalendar, FiXCircle, FiUserX, FiHome } from "react-icons/fi";
 import {
   adminCalendar_Query,
   currentUser_Query,
+  GetRooms_Query,
   usedAnalytics_Query,
 } from "../graphql/Query";
 import type {
   AdminCalender_Interface,
   CurrUser_Interface,
-  ReleaseBooking_Interface,
+  GetRooms_Interface,
   UsedAnalytics_Interface,
 } from "../graphql/Client";
-import { releaseBooking_Mutation } from "../graphql/Mutation";
 import Loader from "../Component/Loader";
 
 function getTodayRange() {
@@ -56,45 +50,16 @@ export default function Dashboard() {
         endDate,
       },
     });
-  const [releaseBooking, { loading: releaseLoading }] =
-    useMutation<ReleaseBooking_Interface>(releaseBooking_Mutation, {
-      refetchQueries: [
-        {
-          query: adminCalendar_Query,
-          variables: {
-            startDate,
-            endDate,
-          },
-        },
-        {
-          query: usedAnalytics_Query,
-          variables: {
-            startDate,
-            endDate,
-          },
-        },
-      ],
-    });
+  const { data: roomsData, loading: roomsLoading } =
+    useQuery<GetRooms_Interface>(GetRooms_Query);
   const user = userData?.CurrUser;
   const bookings = bookingData?.AdminCalender ?? [];
   const analytics = analyticsData?.UsedAnalytics;
-  const handleReleaseBookings = async () => {
-    const confirmed = window.confirm(
-      "Do you want to release expired bookings? ",
-    );
-    if (!confirmed) return;
-    try {
-      const result = await releaseBooking();
-      alert(result.data?.ReleaseBooking || "Bookings released successfully");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("Failed to release bookings");
-      }
-    }
-  };
-  const loading = userLoading || bookingLoading || analyticsLoading;
+
+  const rooms = roomsData?.GetRooms ?? [];
+  const activeRoom = rooms.filter((room) => room.status === "AVAILABLE").length;
+  const loading =
+    userLoading || bookingLoading || analyticsLoading || roomsLoading;
   if (loading) {
     return <Loader />;
   }
@@ -107,17 +72,6 @@ export default function Dashboard() {
         <p className="mt-1 text-sm text-gray-500">
           Here's what's happening today.
         </p>
-        {user?.role === "ADMIN" && (
-          <button
-            type="button"
-            onClick={handleReleaseBookings}
-            disabled={releaseLoading}
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#18216B] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#252d80] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <FiRefreshCw />
-            {releaseLoading ? "Releasing..." : "Release Bookings"}
-          </button>
-        )}
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
@@ -137,11 +91,7 @@ export default function Dashboard() {
         />
         <DashboardCard
           title="Active Rooms"
-          value={
-            analytics?.utilizeByRoom.filter(
-              (item) => item.room.status === "AVAILABLE",
-            ).length ?? 0
-          }
+          value={activeRoom}
           icon={<FiHome />}
         />
       </div>

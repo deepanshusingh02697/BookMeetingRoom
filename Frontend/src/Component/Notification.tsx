@@ -19,10 +19,10 @@ export default function Notification() {
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
   const user = data?.CurrUser;
+
   useEffect(() => {
     if (!user?.id) return;
-    const userId = Number(user.id);
-    const handleNotification = (notification: {
+    const handleNoti = (notification: {
       message: string;
       bookingId: number;
     }) => {
@@ -35,20 +35,12 @@ export default function Notification() {
         },
       ]);
     };
-    const joinUserRoom = () => {
-      socket.emit("joinUser", userId);
-    };
-    socket.on("notify", handleNotification);
-    if (socket.connected) {
-      joinUserRoom();
-    } else {
+    socket.on("notify", handleNoti);
+    if (!socket.connected) {
       socket.connect();
-      socket.once("connect", joinUserRoom);
     }
     return () => {
-      socket.off("notify", handleNotification);
-      socket.off("connect", joinUserRoom);
-      socket.disconnect();
+      socket.off("notify", handleNoti);
     };
   }, [user?.id]);
 
@@ -121,7 +113,10 @@ export default function Notification() {
                   <p className="flex-1 text-sm text-gray-700">{noti.message}</p>
                   <button
                     type="button"
-                    onClick={(e) => {e.stopPropagation(); removeNotification(noti.id)}}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeNotification(noti.id);
+                    }}
                     className="text-gray-400 hover:text-gray-700"
                   >
                     <FiX />

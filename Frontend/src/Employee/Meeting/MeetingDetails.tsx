@@ -276,7 +276,7 @@ export default function MeetingDetails() {
                   <span className="text-xs">Meeting Type</span>
                 </div>
                 <p className="mt-2 text-sm font-semibold text-gray-900">
-                  {meeting.isRecurring
+                  {meeting.recurrenceId
                     ? "Recurring Meeting"
                     : "One-time Meeting"}
                 </p>

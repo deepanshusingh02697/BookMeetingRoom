@@ -130,7 +130,7 @@ export default function BookingDetail({
             </p>
             <p className="mt-1 text-sm">
               {booking.checkIn
-                ? `Checked in at ${new Date(booking.checkIn.checkedInAt).toLocaleTimeString()}`
+                ? `Checked in at ${new Date(Number(booking.checkIn.checkedInAt)).toLocaleTimeString()}`
                 : "Not checked in"}
             </p>
           </div>

@@ -100,8 +100,6 @@ model Booking {
 
   status BookingStatus @default(CONFIRMED)
 
-  isRecurring    Boolean @default(false)
-  recurrenceRule Json?
   recurrenceId   String?
 
   participants Participants[]

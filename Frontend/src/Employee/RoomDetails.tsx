@@ -14,7 +14,6 @@ import Loader from "../Component/Loader";
 
 export default function RoomDetails() {
   const { roomId } = useParams();
-  console.log(roomId);
   const { data, loading, error } = useQuery<GetRoomDeatils_Interface>(
     GetRoomDetails_Query,
     {
@@ -22,16 +21,19 @@ export default function RoomDetails() {
     },
   );
   const room = data?.GetRoomDetails;
-  if (!room) {
+  if (loading) {
     return (
-      <div className="rounded-md border bg-white p-10 text-center shadow-sm">
-        <FiHome className="mx-auto text-3xl text-gray-400" />
-        <h2 className="mt-3 text-lg font-semibold text-gray-900">
-          Room not found
+      <Loader/>
+    );
+  }
+  if (error) {
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center shadow-sm">
+        <FiHome className="mx-auto text-3xl text-red-400" />
+        <h2 className="mt-3 text-lg font-semibold text-red-700">
+          Failed to load room
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Room does not exists what you are looking
-        </p>
+        <p className="mt-1 text-sm text-red-600">{error.message}</p>
         <Link
           to="/rooms"
           className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#18216B] px-4 py-2 text-sm font-medium text-white"
@@ -42,20 +44,16 @@ export default function RoomDetails() {
       </div>
     );
   }
-  if (loading) {
+  if (!room) {
     return (
-      <Loader/>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center shadow-sm">
-        <FiHome className="mx-auto text-3xl text-red-400" />
-        <h2 className="mt-3 text-lg font-semibold text-red-700">
-          Failed to load room
+      <div className="rounded-md border bg-white p-10 text-center shadow-sm">
+        <FiHome className="mx-auto text-3xl text-gray-400" />
+        <h2 className="mt-3 text-lg font-semibold text-gray-900">
+          Room not found
         </h2>
-        <p className="mt-1 text-sm text-red-600">{error.message}</p>
+        <p className="mt-1 text-sm text-gray-500">
+          Room does not exists what you are looking
+        </p>
         <Link
           to="/rooms"
           className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#18216B] px-4 py-2 text-sm font-medium text-white"
@@ -100,10 +98,7 @@ export default function RoomDetails() {
             <span
               className={`rounded px-3 py-1 text-xs font-medium ${
                 room.status === "AVAILABLE"
-                  ? "bg-green-100 text-green-700"
-                  : room.status === "MAINTENANCE"
-                    ? "bg-orange-100 text-orange-700"
-                    : "bg-red-100 text-red-700"
+                  ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
               }`}
             >
               {room.status}

@@ -3,6 +3,14 @@ import { GraphQLError } from "graphql/error";
 export const checkTime = (startTime: string, endTime: string) => {
   const start = new Date(startTime);
   const end = new Date(endTime);
+  if (start <= new Date()) {
+    throw new GraphQLError("Booking cannot be in the past", {
+      extensions: {
+        code: "BAD_INPUT",
+        field: "startTime",
+      },
+    });
+  }
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new GraphQLError("Invalid date format", {
       extensions: { code: "BAD_INPUT" },
@@ -11,18 +19,6 @@ export const checkTime = (startTime: string, endTime: string) => {
   if (start >= end) {
     throw new GraphQLError("Start time must be before end time", {
       extensions: { code: "BAD_INPUT", field: "startTime" },
-    });
-  }
-  return { start, end };
-};
-export const checkBookingTime = (startTime: string, endTime: string) => {
-  const { start, end } = checkTime(startTime, endTime);
-  if (start <= new Date()) {
-    throw new GraphQLError("Booking cannot be in the past", {
-      extensions: {
-        code: "BAD_INPUT",
-        field: "startTime",
-      },
     });
   }
   return { start, end };
@@ -56,26 +52,39 @@ export const buildRecurDates = (
   freq: "DAILY" | "WEEKLY",
   recurEndDate: Date,
 ) => {
-  const durationMs = end.getTime() - start.getTime();
-  const stepDays = freq==="DAILY"?1:7;
-
-  const occur:{start:Date,end:Date}[]=[];
-  let currentStart=new Date(start);
-
-  while(currentStart<=recurEndDate){
-    const curEnd= new Date(currentStart.getTime()+durationMs);
-
-    occur.push({start: new Date(currentStart), end: curEnd});
-
-    currentStart = new Date(
-      currentStart.getTime() + stepDays * 24 * 60 * 60 * 1000,
-    );
+  if (isNaN(recurEndDate.getTime())) {
+    throw new Error("Invalid recurrence end date");
   }
-  if(occur.length===0){
-    throw new Error("Recurrence end date have no occrences");
+  const occur: { start: Date; end: Date }[] = [];
+  const stepDays = freq === "DAILY" ? 1 : 7;
+  const curstart = new Date(start);
+  const curEnd = new Date(end);
+  recurEndDate.setHours(23, 59, 59, 999);
+  while (curstart <= recurEndDate) {
+    occur.push({
+      start: new Date(curstart),
+      end: new Date(curEnd),
+    });
+    curstart.setDate(curstart.getDate() + stepDays);
+    curEnd.setDate(curEnd.getDate() + stepDays);
   }
-  if(occur.length>52){
-    throw new Error("Recurrence range to long");
+  if (occur.length === 0) {
+    throw new Error("Recurrence end date has no occurrences");
+  }
+  if (occur.length > 52) {
+    throw new Error("Recurrence range too long");
   }
   return occur;
+};
+
+export const cancelBooking = (startTime: Date) => {
+  const now = new Date();
+  const oneHourBefore = new Date(
+    startTime.getTime() - 60 * 60 * 1000,
+  );
+  if (now >= oneHourBefore) {
+    throw new Error(
+      "Booking can't be cancelled 1 hour before start meeting",
+    );
+  }
 };

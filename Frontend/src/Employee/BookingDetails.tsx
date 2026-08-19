@@ -75,7 +75,6 @@ export default function BookingDetails() {
   const { data: usersData } = useQuery<Users_Interface>(users_Query);
 
   const booking = data?.BookingDetails;
-  console.log(booking);
   const hcancelBook = async () => {
     if (!booking) return;
     const confirmed = window.confirm("Do you want to cancel this booking?");
@@ -308,7 +307,7 @@ export default function BookingDetails() {
                   <span className="text-xs">Booking Type</span>
                 </div>
                 <p className="mt-2 text-sm font-semibold text-gray-900">
-                  {booking.isRecurring
+                  {booking.recurrenceId
                     ? "Recurring Booking"
                     : "One-time Booking"}
                 </p>

@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./scheduleJob/scheduler";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 import express from "express";
@@ -9,6 +10,7 @@ import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { Context, createCheckAuth } from "./middleware/context";
+import { socketAuth } from "./middleware/socketAuth";
 
 const app = express();
 app.use(cookieParser());
@@ -17,28 +19,34 @@ const port = process.env.PORT || 4003;
 const httpServer = createServer(app);
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://bookmeetingroom-client.onrender.com"],
+    origin: [
+      "http://localhost:5173",
+      "https://bookmeetingroom-client.onrender.com",
+    ],
     credentials: true,
   }),
 );
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173","https://bookmeetingroom-client.onrender.com"],
+    origin: [
+      "http://localhost:5173",
+      "https://bookmeetingroom-client.onrender.com",
+    ],
     credentials: true,
   },
   transports: ["websocket", "polling"],
 });
+io.use(socketAuth);
 io.on("connection", (socket) => {
-  console.log("User connected via socket");
-  console.log("Socket id : ", socket.id);
-  socket.on("joinUser", (userId: number) => {
-    const room = `user:${userId}`;
-    socket.join(room);
-    console.log(
-      `socket, socketId : ${socket.id} joined pariticipant: ${room}`);
-  });
+  const userId = socket.data.userId;
+  console.log("Authenticated user connected");
+  console.log("Socket ID:", socket.id);
+  console.log("User ID:", userId);
+  const room = `user:${userId}`;
+  socket.join(room);
+  console.log(`Socket ${socket.id} joined ${room}`);
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    console.log(`User ${userId} disconnected`);
   });
 });
 

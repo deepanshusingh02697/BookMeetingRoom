@@ -62,8 +62,6 @@ type Booking {
   startTime: String!
   endTime: String!
   status: BookingStatus!
-  isRecurring: Boolean!
-  recurrenceRule: JSON
   recurrenceId: String
   participants: [Participant!]!
   checkIn: CheckIn
@@ -269,7 +267,6 @@ type Mutation {
   LeaveWaitlist(id: Int!): String!
 
   CheckInToBooking(bookingId:Int!):CheckInPayload!
-  ReleaseBooking: String!
 
   CreateMaint(roomId:Int! startTime:String! endTime:String!, reason:String):MaintinancePayload!
   DeleteMain(id:Int!):String!

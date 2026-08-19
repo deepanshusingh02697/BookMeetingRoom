@@ -278,8 +278,6 @@ export const createBooking_Mutation = gql`
         startTime
         endTime
         status
-        isRecurring
-        recurrenceRule
         recurrenceId
         createdAt
         room {
@@ -351,8 +349,6 @@ export const cancelBooking_Mutation = gql`
         startTime
         endTime
         status
-        isRecurring
-        recurrenceRule
         recurrenceId
         createdAt
         room {
@@ -414,8 +410,6 @@ export const addParticipant_Mutation = gql`
         startTime
         endTime
         status
-        isRecurring
-        recurrenceRule
         recurrenceId
         createdAt
         participants {
@@ -449,8 +443,6 @@ export const removeParticipant_Mutation = gql`
         startTime
         endTime
         status
-        isRecurring
-        recurrenceRule
         recurrenceId
         createdAt
         participants {
@@ -538,12 +530,6 @@ export const checkInToBooking_Mutation = gql`
         }
       }
     }
-  }
-`;
-
-export const releaseBooking_Mutation = gql`
-  mutation ReleaseBooking {
-    ReleaseBooking
   }
 `;
 

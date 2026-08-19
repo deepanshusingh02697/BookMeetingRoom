@@ -138,7 +138,7 @@ export default function MyBookings() {
                             >
                               {booking.status}
                             </span>
-                            {booking.isRecurring && (
+                            {booking.recurrenceId && (
                               <span className="rounded bg-purple-100 px-2.5 py-1 text-[11px] font-medium text-purple-700">
                                 Recurring
                               </span>

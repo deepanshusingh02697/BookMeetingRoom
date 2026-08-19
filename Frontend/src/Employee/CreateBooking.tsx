@@ -13,8 +13,11 @@ import type {
   JoinWaitlist_Interface,
   Users_Interface,
 } from "../graphql/Client";
-import { myBookings_Query, myWaitlist_Query, users_Query } from "../graphql/Query";
-import Loader from "../Component/Loader";
+import {
+  myBookings_Query,
+  myWaitlist_Query,
+  users_Query,
+} from "../graphql/Query";
 
 export default function CreateBooking() {
   const { roomId } = useParams();
@@ -26,29 +29,27 @@ export default function CreateBooking() {
   const [endTime, setEndTime] = useState("");
 
   const [isRecurring, setIsRecurring] = useState(false);
-  const [recurFreq, setRecurFreq] = useState<"DAILY" | "WEEKLY">(
-    "WEEKLY",
-  );
+  const [recurFreq, setRecurFreq] = useState<"DAILY" | "WEEKLY">("WEEKLY");
   const [recurEndDate, setRecurEndDate] = useState("");
 
   const [createBooking, { loading }] = useMutation<CreateBooking_Interface>(
-    createBooking_Mutation,{
-      refetchQueries:[{query:myBookings_Query}],
-      awaitRefetchQueries:true
+    createBooking_Mutation,
+    {
+      refetchQueries: [{ query: myBookings_Query }],
+      awaitRefetchQueries: true,
     },
   );
   const { data: usersData, loading: usersLoading } =
     useQuery<Users_Interface>(users_Query);
   const [joinWaitlist, { loading: wlistLoading }] =
-    useMutation<JoinWaitlist_Interface>(joinWaitlist_Mutation,{
-      refetchQueries:[{
-        query:myWaitlist_Query
-      }],
-      awaitRefetchQueries:true
-    })
-  if (loading) {
-    return <Loader/>
-  }
+    useMutation<JoinWaitlist_Interface>(joinWaitlist_Mutation, {
+      refetchQueries: [
+        {
+          query: myWaitlist_Query,
+        },
+      ],
+      awaitRefetchQueries: true,
+    });
   const users = usersData?.Users ?? [];
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +63,10 @@ export default function CreateBooking() {
     }
     if (!startTime || !endTime) {
       toast.error("Please select start and end time");
+      return;
+    }
+    if (isRecurring && !recurEndDate) {
+      toast.error("select a repeatation until date");
       return;
     }
     const start = new Date(startTime);
@@ -95,7 +100,6 @@ export default function CreateBooking() {
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error(error.message);
         toast.error(error.message);
       } else {
         toast.error("Failed to create booking");

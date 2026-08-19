@@ -106,8 +106,6 @@ export const myBookings_Query = gql`
       startTime
       endTime
       status
-      isRecurring
-      recurrenceRule
       recurrenceId
       createdAt
 
@@ -179,8 +177,6 @@ export const bookingDetails_Query = gql`
       startTime
       endTime
       status
-      isRecurring
-      recurrenceRule
       recurrenceId
       createdAt
 
@@ -252,8 +248,6 @@ export const recurringBookingGroup_Query = gql`
       startTime
       endTime
       status
-      isRecurring
-      recurrenceRule
       recurrenceId
       createdAt
 
@@ -325,8 +319,6 @@ export const MyMeetings_Query = gql`
       startTime
       endTime
       status
-      isRecurring
-      recurrenceRule
       recurrenceId
       createdAt
 
@@ -448,8 +440,6 @@ export const adminCalendar_Query = gql`
       startTime
       endTime
       status
-      isRecurring
-      recurrenceRule
       recurrenceId
       createdAt
 
