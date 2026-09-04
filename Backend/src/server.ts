@@ -1,5 +1,4 @@
 import "dotenv/config";
-import "./scheduleJob/scheduler";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 import express from "express";
@@ -11,6 +10,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { Context, createCheckAuth } from "./middleware/context";
 import { socketAuth } from "./middleware/socketAuth";
+import { startScheduler } from "./scheduleJob/scheduler";
 
 const app = express();
 app.use(cookieParser());
@@ -49,6 +49,7 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} disconnected`);
   });
 });
+startScheduler(io);
 
 const server = new ApolloServer<Context>({
   typeDefs,

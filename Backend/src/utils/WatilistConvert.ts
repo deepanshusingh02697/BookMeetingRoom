@@ -2,11 +2,13 @@ import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import { Context } from "../middleware/context";
 
+type NotificationContext = Pick<Context, "io">;
+
 export const convertWeightlist = async (
   roomId: number,
   start: Date,
   end: Date,
-  ctx: Context,
+  ctx: NotificationContext,
 ) => {
   const result = await prisma.$transaction(
     async (tx) => {

@@ -412,8 +412,9 @@ export const resolvers = {
       if (!match) throw new Error("Invalid credentials");
 
       setToken(ctx.res, userExist.id, userExist.role);
+      const {password,...safeUser} =userExist;
 
-      return { success: true, msg: "Login successfully", user: userExist };
+      return { success: true, msg: "Login successfully", user: safeUser };
     },
     AdminLogIn: async (
       _parent: unknown,
@@ -618,7 +619,7 @@ export const resolvers = {
     UpdateRoom: async (
       _parent: unknown,
       args: {
-        id: string;
+        id: number;
         name?: string;
         capacity?: number;
         floor?: number;
@@ -629,7 +630,7 @@ export const resolvers = {
       isAdmin(ctx);
       const updateRoom = await prisma.room.update({
         where: {
-          id: Number(args.id),
+          id: args.id,
         },
         data: {
           ...(args.name !== undefined && { name: checkName(args.name.trim()) }),
@@ -1144,18 +1145,30 @@ export const resolvers = {
       if (!organizer && !admin) {
         throw new Error("Not allowed to cancel booking");
       }
-      for (const bk of bookings) {
-        if (bk.status === "CONFIRMED") {
-          cancelBooking(bk.startTime);
+      const bookingToCancel = bookings.filter((bk) => {
+        if (bk.status !== "CONFIRMED") {
+          return false;
         }
+        if (bk.startTime <= new Date()) {
+          return true;
+        }
+        try {
+          cancelBooking(bk.startTime);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      if (bookingToCancel.length === 0) {
+        return "recurring booking cancel successfully";
       }
       await prisma.booking.updateMany({
-        where: { recurrenceId: args.recurId, status: "CONFIRMED" },
+        where: {
+          id: { in: bookingToCancel.map((bk) => bk.id) },
+          status: "CONFIRMED",
+        },
         data: { status: "CANCELLED" },
       });
-      const bookingToCancel = bookings.filter(
-        (bk) => bk.status === "CONFIRMED",
-      );
       for (const bk of bookingToCancel) {
         await convertWeightlist(bk.roomId, bk.startTime, bk.endTime, ctx);
       }

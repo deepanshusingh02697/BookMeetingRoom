@@ -3,17 +3,17 @@ import { GraphQLError } from "graphql/error";
 export const checkTime = (startTime: string, endTime: string) => {
   const start = new Date(startTime);
   const end = new Date(endTime);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new GraphQLError("Invalid date format", {
+      extensions: { code: "BAD_INPUT" },
+    });
+  }
   if (start <= new Date()) {
     throw new GraphQLError("Booking cannot be in the past", {
       extensions: {
         code: "BAD_INPUT",
         field: "startTime",
       },
-    });
-  }
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    throw new GraphQLError("Invalid date format", {
-      extensions: { code: "BAD_INPUT" },
     });
   }
   if (start >= end) {
