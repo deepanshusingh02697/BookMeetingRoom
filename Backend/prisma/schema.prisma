@@ -40,10 +40,26 @@ model User {
 
   role Role @default(EMPLOYEE)
 
-  bookings      Booking[]       @relation("Organizer")
-  pariticipants Participants[]
-  waitlist      WaitlistEntry[]
-  checkIns      CheckIn[]
+  bookings            Booking[]            @relation("Organizer")
+  pariticipants       Participants[]
+  waitlist            WaitlistEntry[]
+  checkIns            CheckIn[]
+
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id],onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Room {
@@ -56,31 +72,30 @@ model Room {
 
   // equipments  Equipment[]
   roomEquipments RoomEquipment[]
-  bookings    Booking[]
-  Waitlists   WaitlistEntry[]
-  maintenance Maintenance[]
+  bookings       Booking[]
+  Waitlists      WaitlistEntry[]
+  maintenance    Maintenance[]
 }
 
 model Equipment {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
+  id             Int             @id @default(autoincrement())
+  name           String          @unique
   // rooms Room[]
   roomEquipments RoomEquipment[]
-  
 }
 
-model RoomEquipment{
+model RoomEquipment {
   id Int @id @default(autoincrement())
 
   roomId Int
-  room Room @relation(fields: [roomId],references: [id])
+  room   Room @relation(fields: [roomId], references: [id])
 
   equipmentId Int
-  equipment Equipment @relation(fields: [equipmentId],references: [id])
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
 
   createdAt DateTime @default(now())
-  @@unique([roomId, equipmentId])
 
+  @@unique([roomId, equipmentId])
 }
 
 model Booking {
@@ -100,7 +115,7 @@ model Booking {
 
   status BookingStatus @default(CONFIRMED)
 
-  recurrenceId   String?
+  recurrenceId String?
 
   participants Participants[]
 

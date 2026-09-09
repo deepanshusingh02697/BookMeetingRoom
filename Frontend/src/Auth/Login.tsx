@@ -203,7 +203,7 @@ export default function Login() {
           className="relative flex-1 pb-3 text-sm font-medium text-[#18216B]"
         >
           Sign In
-          <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#18216B]" />
+          <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-[#18216B]" />
         </button>
         <button
           type="button"
@@ -331,6 +331,15 @@ export default function Login() {
           {error.password && (
             <p className="mt-1 text-xs text-red-500">{error.password}</p>
           )}
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={()=>navigate("/forgot-password")}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Forgot password?
+          </button>
         </div>
         <button
           type="submit"

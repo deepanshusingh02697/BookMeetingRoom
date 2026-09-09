@@ -125,7 +125,10 @@ type AuthPayload {
   msg: String!
   user: User
 }
-
+type BasicResponse {
+  success: Boolean!
+  msg: String!
+}
 type RoomPayload {
   success:Boolean!
   msg:String!
@@ -199,6 +202,8 @@ type Mutation {
     email: String!
     password: String!
   ): AuthPayload!
+  ForgotPassword(email:String!):BasicResponse!
+  ResetPassword(token:String!,password:String!):BasicResponse!
 
   AdminLogIn(
     email: String!

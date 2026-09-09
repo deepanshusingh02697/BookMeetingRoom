@@ -27,7 +27,22 @@ export const signUpUser_Mutation = gql`
     }
   }
 `;
-
+export const forgotPassword_Mutation=gql`
+  mutation ForgotPassword($email:String!){
+    ForgotPassword(email:$email){
+      success
+      msg
+    }
+  }
+`
+export const resetPassword_Mutation = gql`
+  mutation ResetPassword($token: String!, $password: String!) {
+    ResetPassword(token: $token, password: $password) {
+      success
+      msg
+    }
+  }
+`;
 export const loginUser_Mutation = gql`
   mutation LogIn($email: String!, $password: String!) {
     LogIn(email: $email, password: $password) {

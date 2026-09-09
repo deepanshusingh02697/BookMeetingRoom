@@ -34,7 +34,18 @@ export interface SignUp_Interface {
     } | null;
   };
 }
-
+export interface ForgotPassword_Interface{
+  ForgotPassword: {
+    success: boolean;
+    msg: string;
+  };
+};
+export interface ResetPassword_Interface {
+  ResetPassword: {
+    success: boolean;
+    msg: string;
+  };
+};
 export interface Get_Login_Interface {
   LogIn: {
     success: boolean;

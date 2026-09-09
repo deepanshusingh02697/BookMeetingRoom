@@ -19,6 +19,8 @@ import CreateBooking from "./Employee/CreateBooking";
 import MyWaitlist from "./Employee/MyWaitlist";
 import MyMeetings from "./Employee/Meeting/MyMeetings";
 import MeetingDetails from "./Employee/Meeting/MeetingDetails";
+import ForgotPassword from "./Auth/ForgotPassword";
+import ResetPassword from "./Auth/ResetPassword";
 export default function App() {
   return (
     <>
@@ -32,6 +34,8 @@ export default function App() {
         >
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
 
         <Route
@@ -48,7 +52,7 @@ export default function App() {
           <Route path="rooms/:roomId" element={<RoomDetails />} />
           <Route path="rooms/:roomId/book" element={<CreateBooking />} />
 
-          <Route path="/waitlist" element={<MyWaitlist/>}/>
+          <Route path="/waitlist" element={<MyWaitlist />} />
 
           <Route path="bookings" element={<MyBookings />} />
           <Route path="bookings/:bookingId" element={<BookingDetails />} />

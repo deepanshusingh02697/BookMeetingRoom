@@ -25,8 +25,9 @@ import {
   checkTitle,
 } from "../../Validation/booking.validation";
 import { convertWeightlist } from "../../utils/WatilistConvert";
-import { randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { Prisma } from "../../../generated/prisma/client";
+import { sendResetEmail } from "../../utils/email";
 
 export const resolvers = {
   Query: {
@@ -368,7 +369,7 @@ export const resolvers = {
         email: string;
         password: string;
       },
-      _ctx:unknown
+      _ctx: unknown,
     ) => {
       checkFirstName(args.firstname);
       checkLastName(args.lastname);
@@ -412,9 +413,105 @@ export const resolvers = {
       if (!match) throw new Error("Invalid credentials");
 
       setToken(ctx.res, userExist.id, userExist.role);
-      const {password,...safeUser} =userExist;
+      const { password, ...safeUser } = userExist;
 
       return { success: true, msg: "Login successfully", user: safeUser };
+    },
+    ForgotPassword: async (
+      _parent: unknown,
+      args: { email: string },
+      _ctx: unknown,
+    ) => {
+      const email = args.email.toLocaleLowerCase().trim();
+      checkemail(email);
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+      if (!user) {
+        return {
+          success: true,
+          msg: "If the email exists, a reset link has been sent.",
+        };
+      }
+
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
+      const resetToken = randomBytes(32).toString("hex");
+      console.log("resetToken is : ====> ",resetToken);
+      
+      const tokenHash = createHash("sha256").update(resetToken).digest("hex");
+      console.log("tokenhash is : =====> ",tokenHash);
+      
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+      await prisma.passwordResetToken.create({
+        data: {
+          tokenHash,
+          userId: user.id,
+          expiresAt,
+        },
+      });
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+      await sendResetEmail(user.email, resetUrl);
+      return {
+        success: true,
+        msg: "If the email exists, a reset link has been sent.",
+      };
+    },
+    ResetPassword: async (
+      _parent: unknown,
+      args: { token: string; password: string },
+      _ctx: unknown,
+    ) => {
+      checkPassword(args.password);
+
+      const tokenHash = createHash("sha256").update(args.token).digest("hex");
+
+      const resetToken = await prisma.passwordResetToken.findUnique({
+        where: {
+          tokenHash,
+        },
+      });
+
+      if (!resetToken) {
+        throw new Error("Invalid or expired reset link");
+      }
+      if (resetToken.usedAt) {
+        throw new Error("Reset link has already been used");
+      }
+
+      if (resetToken.expiresAt < new Date()) {
+        throw new Error("Reset link has expired");
+      }
+
+      const hashedPassword = await bcrypt.hash(args.password, 10);
+
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: resetToken.userId,
+          },
+          data: {
+            password: hashedPassword,
+          },
+        }),
+
+        prisma.passwordResetToken.update({
+          where: {
+            id: resetToken.id,
+          },
+          data: {
+            usedAt: new Date(),
+          },
+        }),
+      ]);
+
+      return {
+        success: true,
+        msg: "Password reset successfully",
+      };
     },
     AdminLogIn: async (
       _parent: unknown,
