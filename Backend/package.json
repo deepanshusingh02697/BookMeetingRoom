@@ -47,7 +47,9 @@
     "node-cron": "^4.6.0",
     "nodemailer": "^10.0.1",
     "pg": "^8.23.0",
-    "socket.io": "^4.8.3"
+    "reflect-metadata": "^0.2.2",
+    "socket.io": "^4.8.3",
+    "typeorm": "^1.1.1"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -1,4 +1,4 @@
-{
+/* {
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -6,5 +6,21 @@
     "strict": true,
     "esModuleInterop": true,
     "ignoreDeprecations": "6.0"
+  }
+} */
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "strict": true,
+    "strictPropertyInitialization": false,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }

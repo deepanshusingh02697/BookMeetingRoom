@@ -16,7 +16,7 @@ export default defineConfig([
     },
   },
   tseslint.configs.recommended,
-  {
+/*   {
   rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
@@ -39,5 +39,5 @@ export default defineConfig([
       "padded-blocks": ["error", "never"],
       semi: ["error", "always"],
     },
-  },
+  }, */
 ]);

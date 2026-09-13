@@ -1,16 +1,18 @@
+import "reflect-metadata";
 import "dotenv/config";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 import express from "express";
 import { createServer } from "node:http";
-import { typeDefs } from "./graphql/Typedefs/typedefs";
-import { resolvers } from "./graphql/Resolver/resolvers";
+import { typeDefs } from "./graphql/Typedefs/typedefs.js";
+import { resolvers } from "./graphql/Resolver/resolvers.js";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { Context, createCheckAuth } from "./middleware/context";
-import { socketAuth } from "./middleware/socketAuth";
-import { startScheduler } from "./scheduleJob/scheduler";
+import { Context, createCheckAuth } from "./middleware/context.js";
+import { socketAuth } from "./middleware/socketAuth.js";
+import { startScheduler } from "./scheduleJob/scheduler.js";
+import { AppDataSource } from "./TypeOrm/config/data-source.js";
 
 const app = express();
 app.use(cookieParser());
@@ -49,7 +51,7 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} disconnected`);
   });
 });
-startScheduler(io);
+// startScheduler(io);
 
 const server = new ApolloServer<Context>({
   typeDefs,
@@ -57,17 +59,44 @@ const server = new ApolloServer<Context>({
 });
 
 async function startServer() {
+  // await server.start();
+  // app.use(
+  //   "/graphql",
+  //   express.json(),
+  //   expressMiddleware(server, { context: createCheckAuth(io) }),
+  // );
+  // httpServer.listen(port, () => {
+  //   console.log(`Server is ready to listen at http://localhost:${port}`);
+  // });
+  await AppDataSource.initialize();
+
+  console.log("Database Connected");
+
   await server.start();
+
   app.use(
     "/graphql",
     express.json(),
-    expressMiddleware(server, { context: createCheckAuth(io) }),
+    expressMiddleware(server, {
+      context: createCheckAuth(io),
+    }),
   );
+
+  startScheduler(io);
+
   httpServer.listen(port, () => {
     console.log(`Server is ready to listen at http://localhost:${port}`);
   });
 }
 
-startServer().catch((err) => {
-  console.error("Server failed to start ", err);
+startServer().catch((error) => {
+  console.error("Server failed to start ", error);
+  console.error(error);
+
+  if (error instanceof Error) {
+    console.error(error.message);
+    console.error(error.stack);
+  }
+
+  process.exit(1);
 });
