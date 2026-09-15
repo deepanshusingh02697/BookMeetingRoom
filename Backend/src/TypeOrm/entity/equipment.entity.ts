@@ -1,14 +1,19 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoomEquipment } from "./room-equipment.entity.js";
+import { Field, ID, ObjectType } from "type-graphql";
 
+@ObjectType()
 @Entity("Equipment")
-export class Equipment{
-    @PrimaryGeneratedColumn()
-    id:number;
+export class Equipment {
+  @Field(() => ID)
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({type:"varchar",unique:true})
-    name:string
+  @Field(() => String)
+  @Column({ type: "varchar", unique: true })
+  name: string;
 
-    @OneToMany(()=>RoomEquipment,(roomEquipment)=>roomEquipment.equipment)
-    roomEquipments:RoomEquipment[]
+  @Field(() => [RoomEquipment])
+  @OneToMany(() => RoomEquipment,(roomEquipment) => roomEquipment.equipment)
+  roomEquipments: RoomEquipment[];
 }

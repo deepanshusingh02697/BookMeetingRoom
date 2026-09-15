@@ -13,6 +13,7 @@ import { Context, createCheckAuth } from "./middleware/context.js";
 import { socketAuth } from "./middleware/socketAuth.js";
 import { startScheduler } from "./scheduleJob/scheduler.js";
 import { AppDataSource } from "./TypeOrm/config/data-source.js";
+import { buildSchema } from "graphql";
 
 const app = express();
 app.use(cookieParser());
@@ -53,24 +54,28 @@ io.on("connection", (socket) => {
 });
 // startScheduler(io);
 
-const server = new ApolloServer<Context>({
+/* const server = new ApolloServer<Context>({
   typeDefs,
   resolvers,
-});
+}); */
 
 async function startServer() {
-  // await server.start();
-  // app.use(
-  //   "/graphql",
-  //   express.json(),
-  //   expressMiddleware(server, { context: createCheckAuth(io) }),
-  // );
-  // httpServer.listen(port, () => {
-  //   console.log(`Server is ready to listen at http://localhost:${port}`);
-  // });
+/*   await server.start();
+  app.use(
+    "/graphql",
+    express.json(),
+    expressMiddleware(server, { context: createCheckAuth(io) }),
+  );
+  httpServer.listen(port, () => {
+    console.log(`Server is ready to listen at http://localhost:${port}`);
+  }); */
   await AppDataSource.initialize();
-
   console.log("Database Connected");
+
+  const schema = await buildSchema({
+    resolvers:[]
+  })
+  const server = new ApolloServer<Context>({schema})
 
   await server.start();
 
