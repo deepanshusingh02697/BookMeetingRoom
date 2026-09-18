@@ -22,22 +22,22 @@ export class BookingType {
   @Field(() => UserType)
   organizer: UserType;
 
-  @Field()
+  @Field(() => String)
   title: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   description: string | null;
 
-  @Field()
+  @Field(() => String)
   startTime: string;
 
-  @Field()
+  @Field(() => String)
   endTime: string;
 
   @Field(() => BookingStatus)
   status: BookingStatus;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   recurrenceId: string | null;
 
   @Field(() => [ParticipantType])
@@ -46,6 +46,6 @@ export class BookingType {
   @Field(() => CheckInType, { nullable: true })
   checkIn: CheckInType | null;
 
-  @Field()
+  @Field(() => String)
   createdAt: string;
 }

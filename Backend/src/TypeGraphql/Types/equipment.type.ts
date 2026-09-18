@@ -6,7 +6,7 @@ export class EquipmentType {
   @Field(() => ID)
   id: number;
 
-  @Field()
+  @Field(() => String)
   name: string;
 
   @Field(() => [RoomType])

@@ -19,6 +19,6 @@ export class CheckInType {
   @Field(() => UserType)
   user: UserType;
 
-  @Field()
+  @Field(() => String)
   checkedInAt: string;
 }

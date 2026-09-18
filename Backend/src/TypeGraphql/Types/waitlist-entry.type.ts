@@ -19,12 +19,12 @@ export class WaitlistEntryType {
   @Field(() => UserType)
   user: UserType;
 
-  @Field()
+  @Field(() => String)
   startTime: string;
 
-  @Field()
+  @Field(() => String)
   endTime: string;
 
-  @Field()
+  @Field(() => String)
   createdAt: string;
 }

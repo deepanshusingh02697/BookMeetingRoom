@@ -13,12 +13,7 @@ import { Participants } from "./participants.entity.js";
 import { WaitlistEntry } from "./waitlist-entry.entity.js";
 import { CheckIn } from "./check-in.entity.js";
 import { PasswordResetToken } from "./password-reset-token.entity.js";
-import { Field, GraphQLISODateTime, ID, ObjectType, registerEnumType } from "type-graphql";
-
-registerEnumType(Role, {
-  name: "Role",
-  description: "User roles",
-});
+import { Field, GraphQLISODateTime, ID, ObjectType } from "type-graphql";
 
 @ObjectType()
 @Entity("User")

@@ -13,7 +13,17 @@ import { Context, createCheckAuth } from "./middleware/context.js";
 import { socketAuth } from "./middleware/socketAuth.js";
 import { startScheduler } from "./scheduleJob/scheduler.js";
 import { AppDataSource } from "./TypeOrm/config/data-source.js";
-import { buildSchema } from "graphql";
+import { buildSchema } from "type-graphql";
+import { AuthResolver } from "./TypeGraphql/resolver/auth.resolver.js";
+import { UserResolver } from "./TypeGraphql/resolver/user.resolver.js";
+import { RoomResolver } from "./TypeGraphql/resolver/room.resolver.js";
+import { EquipmentResolver } from "./TypeGraphql/resolver/equipment.resolver.js";
+import { BookingResolver } from "./TypeGraphql/resolver/booking.resolver.js";
+import { ParticipantResolver } from "./TypeGraphql/resolver/participant.resolver.js";
+import { CheckInResolver } from "./TypeGraphql/resolver/check-in.resolver.js";
+import { WaitlistResolver } from "./TypeGraphql/resolver/waitlist.resolver.js";
+import { MaintenanceResolver } from "./TypeGraphql/resolver/maintenance.resolver.js";
+import { AnalyticsResolver } from "./TypeGraphql/resolver/analytics.resolver.js";
 
 const app = express();
 app.use(cookieParser());
@@ -73,7 +83,18 @@ async function startServer() {
   console.log("Database Connected");
 
   const schema = await buildSchema({
-    resolvers:[]
+    resolvers: [
+      AuthResolver,
+      UserResolver,
+      RoomResolver,
+      EquipmentResolver,
+      BookingResolver,
+      ParticipantResolver,
+      CheckInResolver,
+      WaitlistResolver,
+      MaintenanceResolver,
+      AnalyticsResolver,
+    ],
   })
   const server = new ApolloServer<Context>({schema})
 

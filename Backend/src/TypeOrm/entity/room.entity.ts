@@ -10,7 +10,6 @@ import {
   ID,
   Int,
   ObjectType,
-  registerEnumType,
 } from "type-graphql";
 
 import { RoomStatus } from "./enums.js";
@@ -18,11 +17,6 @@ import { RoomEquipment } from "./room-equipment.entity.js";
 import { Booking } from "./booking.entity.js";
 import { WaitlistEntry } from "./waitlist-entry.entity.js";
 import { Maintenance } from "./maintenance.entity.js";
-
-registerEnumType(RoomStatus, {
-  name: "RoomStatus",
-  description: "Status of the meeting room",
-});
 
 @ObjectType()
 @Entity("Room")

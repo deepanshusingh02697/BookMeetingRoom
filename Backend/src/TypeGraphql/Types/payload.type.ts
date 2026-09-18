@@ -9,10 +9,10 @@ import { WaitlistEntryType } from "./waitlist-entry.type.js";
 
 @ObjectType("AuthPayload")
 export class AuthPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => UserType, { nullable: true })
@@ -21,19 +21,19 @@ export class AuthPayloadType {
 
 @ObjectType("BasicResponse")
 export class BasicResponseType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 }
 
 @ObjectType("RoomPayload")
 export class RoomPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => RoomType, { nullable: true })
@@ -42,10 +42,10 @@ export class RoomPayloadType {
 
 @ObjectType("EquipmentPayload")
 export class EquipmentPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => EquipmentType, { nullable: true })
@@ -54,10 +54,10 @@ export class EquipmentPayloadType {
 
 @ObjectType("BookingPayload")
 export class BookingPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => BookingType, { nullable: true })
@@ -66,10 +66,10 @@ export class BookingPayloadType {
 
 @ObjectType("CheckInPayload")
 export class CheckInPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => CheckInType, { nullable: true })
@@ -78,10 +78,10 @@ export class CheckInPayloadType {
 
 @ObjectType("WaitListPayload")
 export class WaitListPayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => WaitlistEntryType, { nullable: true })
@@ -90,10 +90,10 @@ export class WaitListPayloadType {
 
 @ObjectType("MaintinancePayload")
 export class MaintinancePayloadType {
-  @Field()
+  @Field(() => Boolean)
   success: boolean;
 
-  @Field()
+  @Field(() => String)
   msg: string;
 
   @Field(() => MaintenanceType, { nullable: true })

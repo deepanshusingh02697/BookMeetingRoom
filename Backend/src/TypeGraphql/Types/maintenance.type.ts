@@ -12,12 +12,12 @@ export class MaintenanceType {
   @Field(() => RoomType)
   room: RoomType;
 
-  @Field()
+  @Field(() => String)
   startTime: string;
 
-  @Field()
+  @Field(() => String)
   endTime: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   reason: string | null;
 }

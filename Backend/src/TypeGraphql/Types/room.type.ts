@@ -7,7 +7,7 @@ export class RoomType {
   @Field(() => ID)
   id: number;
 
-  @Field()
+  @Field(() => String)
   name: string;
 
   @Field(() => Int)
@@ -16,7 +16,7 @@ export class RoomType {
   @Field(() => Int)
   floor: number;
 
-  @Field()
+  @Field(() => String)
   location: string;
 
   @Field(() => RoomStatus)

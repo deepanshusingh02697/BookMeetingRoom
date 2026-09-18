@@ -6,21 +6,21 @@ export class UserType {
   @Field(() => ID)
   id: number;
 
-  @Field()
+  @Field(() => String)
   firstname: string;
 
-  @Field()
+  @Field(() => String)
   lastname: string;
 
-  @Field()
+  @Field(() => String)
   email: string;
 
   @Field(() => Role)
   role: Role;
 
-  @Field()
+  @Field(() => String)
   createdAt: string;
 
-  @Field()
+  @Field(() => String)
   updatedAt: string;
 }
